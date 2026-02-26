@@ -81,6 +81,7 @@ export interface DiaryData {
 export interface Subscription {
   plan: string;
   max_rooms: number;
+  extra_rooms: number;
   expires_at?: string;
   trial_ends_at?: string;
   is_active: boolean;

@@ -104,7 +104,7 @@ export default function LandingPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs sm:text-sm mb-4 sm:mb-6">
                 <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                Dùng thử 7 ngày miễn phí
+                Dùng thử 14 ngày miễn phí
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6">
@@ -348,7 +348,7 @@ export default function LandingPage() {
           <div className="text-center mb-10 sm:mb-16">
             <p className="text-teal-400 font-semibold text-sm uppercase tracking-widest mb-3">Đơn giản & minh bạch</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Bảng giá</h2>
-            <p className="text-slate-400 mt-3 text-sm sm:text-base">Dùng thử 7 ngày miễn phí, nâng cấp trực tiếp khi cần</p>
+            <p className="text-slate-400 mt-3 text-sm sm:text-base">Dùng thử 14 ngày miễn phí, nâng cấp trực tiếp khi cần</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
@@ -428,7 +428,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-base sm:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto">
               Tham gia cùng hàng chục pet hotel đã tin dùng PetLog. 
-              Setup trong 5 phút, dùng thử 7 ngày miễn phí.
+              Setup trong 5 phút, dùng thử 14 ngày miễn phí.
             </p>
 
             <Link href="/register"

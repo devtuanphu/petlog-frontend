@@ -180,10 +180,10 @@ class ApiClient {
     }>>('/payment/plans');
   }
 
-  createPayment(plan: string, months: number, upgrade = false) {
+  createPayment(plan: string, months: number, upgrade = false, extra_rooms = 0) {
     return this.request<{ checkoutUrl: string; orderCode: number; amount: number }>(
       '/payment/create',
-      { method: 'POST', body: JSON.stringify({ plan, months, upgrade }) },
+      { method: 'POST', body: JSON.stringify({ plan, months, upgrade, extra_rooms }) },
     );
   }
 
@@ -214,6 +214,26 @@ class ApiClient {
       plan_name: string; months: number; status: string;
       created_at: string; paid_at: string | null;
     }>>('/payment/history');
+  }
+
+  // Extra rooms
+  calculateExtraRooms(count: number) {
+    return this.request<{
+      count: number; price_per_room: number; days_remaining: number;
+      current_extra: number; new_total: number; max_rooms_after: number;
+      amount: number; message: string;
+    }>(`/payment/extra-rooms-cost?count=${count}`);
+  }
+
+  createExtraRoomPayment(count: number) {
+    return this.request<{ checkoutUrl: string; orderCode: number; amount: number }>(
+      '/payment/extra-rooms',
+      { method: 'POST', body: JSON.stringify({ count }) },
+    );
+  }
+
+  getExtraRoomPrice() {
+    return this.request<{ price: number }>('/payment/extra-room-price');
   }
 }
 

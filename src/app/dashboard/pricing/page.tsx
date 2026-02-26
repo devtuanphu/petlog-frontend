@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { Crown, Check, Zap, Star, Clock, CreditCard, ArrowUp } from 'lucide-react';
+import { Crown, Check, Zap, Star, Clock, CreditCard, ArrowUp, Plus, Minus } from 'lucide-react';
 
 type Plan = {
   id: number;
@@ -47,23 +47,30 @@ const planIcons: Record<string, typeof Crown> = {
   unlimited: Crown,
 };
 
+const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
+
 export default function PricingPage() {
+  const router = useRouter();
   const { subscription } = useAuth();
   const searchParams = useSearchParams();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [paying, setPaying] = useState<string | null>(null);
   const [months, setMonths] = useState(1);
   const [upgradeCalc, setUpgradeCalc] = useState<UpgradeCalc | null>(null);
   const [calcLoading, setCalcLoading] = useState<string | null>(null);
+  const [extraCount, setExtraCount] = useState(5);
+  const [extraCalc, setExtraCalc] = useState<{ count: number; price_per_room: number; days_remaining: number; current_extra: number; new_total: number; max_rooms_after: number; amount: number; message: string } | null>(null);
+  const [extraLoading, setExtraLoading] = useState(false);
+  const [extraPaying, setExtraPaying] = useState(false);
+  const [extraRoomPrice, setExtraRoomPrice] = useState(10000);
   const status = searchParams.get('status');
 
   const isPaid = subscription?.plan && subscription.plan !== 'trial' && subscription.plan !== 'free';
 
   useEffect(() => {
-    Promise.all([api.getPlans(), api.getPayments()])
-      .then(([p, h]) => { setPlans(p); setPayments(h); })
+    Promise.all([api.getPlans(), api.getPayments(), api.getExtraRoomPrice()])
+      .then(([p, h, ep]) => { setPlans(p); setPayments(h); setExtraRoomPrice(ep.price); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -91,27 +98,43 @@ export default function PricingPage() {
     }
   }, [isPaid, subscription?.plan]);
 
-  const handlePay = async (planName: string) => {
-    setPaying(planName);
+  // Navigate to checkout page
+  const goToCheckout = (plan: Plan) => {
+    const params = new URLSearchParams({
+      plan: plan.name,
+      months: months.toString(),
+      upgrade: (isPaid && plan.name !== subscription?.plan) ? 'true' : 'false',
+    });
+    router.push(`/dashboard/pricing/checkout?${params.toString()}`);
+  };
+
+  // Extra rooms calculation (for standalone purchase section)
+  const calcExtra = useCallback(async (count: number) => {
+    if (!isPaid || count < 1) { setExtraCalc(null); return; }
+    setExtraLoading(true);
     try {
-      if (isPaid && planName !== subscription?.plan) {
-        // Upgrade flow
-        const res = await api.createPayment(planName, 0, true);
-        if (res.amount === 0) {
-          // Free upgrade
-          window.location.href = res.checkoutUrl;
-        } else {
-          window.location.href = res.checkoutUrl;
-        }
-      } else {
-        // Normal purchase
-        const res = await api.createPayment(planName, months);
-        window.location.href = res.checkoutUrl;
-      }
+      const calc = await api.calculateExtraRooms(count);
+      setExtraCalc(calc);
+    } catch {
+      setExtraCalc(null);
+    } finally {
+      setExtraLoading(false);
+    }
+  }, [isPaid]);
+
+  useEffect(() => {
+    if (isPaid) calcExtra(extraCount);
+  }, [extraCount, isPaid, calcExtra]);
+
+  const handleBuyExtraRooms = async () => {
+    setExtraPaying(true);
+    try {
+      const res = await api.createExtraRoomPayment(extraCount);
+      window.location.href = res.checkoutUrl;
     } catch (err: unknown) {
       const e = err as Error;
       alert(e.message || 'Lỗi tạo thanh toán');
-      setPaying(null);
+      setExtraPaying(false);
     }
   };
 
@@ -165,7 +188,7 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Duration selector — only for new purchases, not upgrades */}
+      {/* Duration selector — only for new purchases */}
       {!isPaid && (
         <div className="flex items-center gap-3 mb-6">
           <span className="text-sm text-slate-400">Thời hạn:</span>
@@ -190,7 +213,7 @@ export default function PricingPage() {
         </div>
       )}
 
-      {/* Upgrade notice for paid users */}
+      {/* Upgrade notice */}
       {isPaid && (
         <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
           <p className="text-sm text-blue-300">
@@ -200,7 +223,7 @@ export default function PricingPage() {
         </div>
       )}
 
-      {/* Plans grid */}
+      {/* Plans grid — clean cards, click to go to checkout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {plans.map((plan) => {
           const Icon = planIcons[plan.name] || Zap;
@@ -236,18 +259,17 @@ export default function PricingPage() {
               </div>
 
               <div className="text-center mb-6">
-                <p className="text-3xl font-bold">{(plan.price / 1000).toFixed(0)}k</p>
+                <p className="text-3xl font-bold">{fmt(plan.price)}</p>
                 <p className="text-sm text-slate-400">/tháng</p>
                 {!isPaid && months > 1 && (
                   <p className="text-sm text-teal-400 mt-1">
-                    Tổng: {(totalPrice / 1000).toFixed(0)}k cho {months} tháng
+                    Tổng: {fmt(totalPrice)} cho {months} tháng
                   </p>
                 )}
-                {/* Show prorated upgrade cost */}
                 {isUpgradeTarget && upgradeCalc && (
                   <div className="mt-3 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
                     <p className="text-sm text-blue-300 font-medium">
-                      Chỉ trả: {(upgradeCalc.amount / 1000).toFixed(0)}k
+                      Chỉ trả: {fmt(upgradeCalc.amount)}
                     </p>
                     <p className="text-xs text-slate-400 mt-1">
                       ({upgradeCalc.days_remaining} ngày còn lại)
@@ -276,11 +298,15 @@ export default function PricingPage() {
                   <Check size={14} className="text-teal-400" />
                   <span>Nhật ký thú cưng</span>
                 </li>
+                <li className="flex items-center gap-2 text-sm">
+                  <Plus size={14} className="text-purple-400" />
+                  <span className="text-purple-300">Mua thêm phòng: <strong>{fmt(extraRoomPrice)}</strong>/phòng/tháng</span>
+                </li>
               </ul>
 
               <button
-                onClick={() => handlePay(plan.name)}
-                disabled={isCurrent || isLower || paying === plan.name}
+                onClick={() => goToCheckout(plan)}
+                disabled={isCurrent || isLower}
                 className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
                   isCurrent
                     ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
@@ -290,16 +316,14 @@ export default function PricingPage() {
                         ? 'bg-teal-600 hover:bg-teal-500 text-white'
                         : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}>
-                {paying === plan.name ? (
-                  'Đang xử lý...'
-                ) : isCurrent ? (
+                {isCurrent ? (
                   'Gói hiện tại'
                 ) : isLower ? (
                   'Không thể hạ gói'
                 ) : isPaid ? (
                   <><ArrowUp size={16} /> Nâng cấp</>
                 ) : (
-                  <><CreditCard size={16} /> Thanh toán</>
+                  <><CreditCard size={16} /> Chọn gói</>
                 )}
               </button>
             </div>
@@ -307,12 +331,135 @@ export default function PricingPage() {
         })}
       </div>
 
+      {/* Extra Rooms Section — only for paid users */}
+      {isPaid && (
+        <div className="mb-10 rounded-2xl border border-purple-500/20 bg-slate-900/50 overflow-hidden">
+          {/* Compact header */}
+          <div className="px-5 py-4 flex items-center justify-between border-b border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                <Plus size={16} className="text-purple-400" />
+              </div>
+              <div>
+                <h2 className="font-bold text-base">Mua thêm phòng</h2>
+                <p className="text-xs text-slate-500">Mở rộng không cần đổi gói</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-semibold text-purple-300">{fmt(extraRoomPrice)}</p>
+              <p className="text-[10px] text-slate-500">/phòng/tháng</p>
+            </div>
+          </div>
+
+          <div className="p-5 space-y-4">
+            {/* Current rooms — compact pills */}
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-xs font-medium text-teal-300">
+                Gói: {subscription?.max_rooms || 0} phòng
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-medium text-purple-300">
+                Đã mua thêm: {subscription?.extra_rooms || 0}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-700/50 border border-slate-600/30 text-xs font-medium text-white">
+                Tổng: {(subscription?.max_rooms || 0) + (subscription?.extra_rooms || 0)} phòng
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-700/50 border border-slate-600/30 text-xs text-slate-400">
+                <Clock size={10} /> {extraCalc?.days_remaining || '—'} ngày còn lại
+              </span>
+            </div>
+
+            {/* Input row — tighter, more professional */}
+            <div>
+              <p className="text-xs text-slate-500 mb-2">Số phòng muốn thêm</p>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center flex-1 max-w-[200px]">
+                  <button
+                    onClick={() => setExtraCount(Math.max(1, extraCount - 1))}
+                    className="h-10 w-10 rounded-l-lg bg-slate-800 border border-slate-600/80 hover:bg-slate-700 flex items-center justify-center transition-colors"
+                  >
+                    <Minus size={14} className="text-slate-400" />
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={extraCount}
+                    onChange={e => {
+                      const v = e.target.value.replace(/[^0-9]/g, '');
+                      setExtraCount(Math.max(1, parseInt(v) || 1));
+                    }}
+                    className="h-10 w-full bg-slate-800/80 border-y border-slate-600/80 text-center text-lg font-bold focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                  <button
+                    onClick={() => setExtraCount(extraCount + 1)}
+                    className="h-10 w-10 rounded-r-lg bg-slate-800 border border-slate-600/80 hover:bg-slate-700 flex items-center justify-center transition-colors"
+                  >
+                    <Plus size={14} className="text-slate-400" />
+                  </button>
+                </div>
+                {/* Quick chips inline */}
+                <div className="flex gap-1.5 flex-1">
+                  {[5, 10, 20, 50].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => setExtraCount(n)}
+                      className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${
+                        extraCount === n
+                          ? 'bg-purple-600/25 text-purple-300 border border-purple-500/40'
+                          : 'bg-slate-800/60 text-slate-500 border border-slate-700/60 hover:border-slate-600'
+                      }`}
+                    >
+                      +{n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Price summary — compact, clean */}
+            {extraLoading ? (
+              <div className="text-center py-3">
+                <span className="text-xs text-slate-500 animate-pulse">Đang tính giá...</span>
+              </div>
+            ) : extraCalc && (
+              <div className="rounded-xl bg-slate-800/50 border border-slate-700/40 p-4">
+                <div className="space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{extraCount} phòng × {fmt(extraRoomPrice)} × {extraCalc.days_remaining} ngày</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Tổng phòng sau mua</span>
+                    <span className="text-white font-medium">{extraCalc.max_rooms_after} phòng</span>
+                  </div>
+                </div>
+                <div className="border-t border-slate-700/50 mt-3 pt-3 flex justify-between items-center">
+                  <span className="text-sm text-slate-300">Thành tiền</span>
+                  <span className="text-xl font-bold text-purple-400">{fmt(extraCalc.amount)}</span>
+                </div>
+              </div>
+            )}
+
+            {/* CTA */}
+            <button
+              onClick={handleBuyExtraRooms}
+              disabled={extraPaying || !extraCalc}
+              className="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-purple-600/20"
+            >
+              {extraPaying ? (
+                <span className="animate-pulse">Đang xử lý...</span>
+              ) : (
+                <><CreditCard size={16} /> Mua thêm {extraCount} phòng — {extraCalc ? fmt(extraCalc.amount) : '...'}</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Payment history */}
       {payments.length > 0 && (
         <div>
           <h2 className="text-lg font-bold mb-4">Lịch sử thanh toán</h2>
-          <div className="rounded-xl overflow-hidden border border-slate-700">
-            <table className="w-full text-sm">
+          <div className="rounded-xl overflow-hidden border border-slate-700 overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="bg-slate-800">
                   <th className="text-left p-3 text-slate-400">Ngày</th>
@@ -326,9 +473,9 @@ export default function PricingPage() {
                 {payments.map(p => (
                   <tr key={p.id} className="border-t border-slate-800">
                     <td className="p-3">{new Date(p.created_at).toLocaleDateString('vi-VN')}</td>
-                    <td className="p-3">{p.plan_name}</td>
-                    <td className="p-3">{p.months === 0 ? '↗️ Nâng cấp' : `${p.months} tháng`}</td>
-                    <td className="p-3 text-right">{(p.amount / 1000).toFixed(0)}k</td>
+                    <td className="p-3">{p.plan_name === 'extra_rooms' ? 'Mua thêm phòng' : p.plan_name}</td>
+                    <td className="p-3">{p.plan_name === 'extra_rooms' ? `+${p.months} phòng` : p.months === 0 ? '↗️ Nâng cấp' : `${p.months} tháng`}</td>
+                    <td className="p-3 text-right">{fmt(p.amount)}</td>
                     <td className="p-3 text-center">
                       <span className={`px-2 py-1 rounded text-xs ${
                         p.status === 'paid'
