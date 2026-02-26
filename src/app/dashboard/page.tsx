@@ -14,8 +14,18 @@ function isOverdue(room: Room): boolean {
   return new Date(room.active_booking.expected_checkout) < new Date();
 }
 
-function daysOverdue(date: string): number {
-  return Math.ceil((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
+function overdueText(date: string): string {
+  const diffMs = Date.now() - new Date(date).getTime();
+  const diffMin = Math.floor(diffMs / (1000 * 60));
+  if (diffMin < 60) return `trễ ${diffMin} phút`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) {
+    const remainMin = diffMin % 60;
+    return remainMin > 0 ? `trễ ${diffHours}h${remainMin}p` : `trễ ${diffHours} giờ`;
+  }
+  const diffDays = Math.floor(diffHours / 24);
+  const remainHours = diffHours % 24;
+  return remainHours > 0 ? `trễ ${diffDays} ngày ${remainHours}h` : `trễ ${diffDays} ngày`;
 }
 
 export default function DashboardPage() {
@@ -158,7 +168,7 @@ export default function DashboardPage() {
                       <Clock size={10} className="shrink-0" />
                       <span className="truncate">
                         Đón: {new Date(room.active_booking.expected_checkout).toLocaleString('vi-VN')}
-                        {overdue && ` (trễ ${daysOverdue(room.active_booking.expected_checkout)} ngày)`}
+                        {overdue && ` (${overdueText(room.active_booking.expected_checkout)})`}
                       </span>
                     </div>
                   )}
