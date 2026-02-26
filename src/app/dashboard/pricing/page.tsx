@@ -228,7 +228,7 @@ export default function PricingPage() {
         {plans.map((plan) => {
           const Icon = planIcons[plan.name] || Zap;
           const isCurrent = subscription?.plan === plan.name;
-          const isLower = isPaid && (plans.findIndex(p => p.name === plan.name) < plans.findIndex(p => p.name === subscription?.plan));
+          const isLower = !!(isPaid && (plans.findIndex(p => p.name === plan.name) < plans.findIndex(p => p.name === subscription?.plan)));
           const discount = months === 12 ? 0.9 : 1;
           const totalPrice = plan.price * months * discount;
           const isPopular = plan.name === 'pro';
