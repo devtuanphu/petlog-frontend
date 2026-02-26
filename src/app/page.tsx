@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
-import { PawPrint, UtensilsCrossed, ClipboardEdit, Printer, Sparkles, ShieldCheck, Clock, Heart, Star, MessageCircle, Check, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { PawPrint, UtensilsCrossed, ClipboardEdit, Printer, Sparkles, ShieldCheck, Clock, Heart, Star, MessageCircle, Check, Menu, X, Plus } from 'lucide-react';
 
-const pricingPlans = [
-  { name: 'Cơ bản', rooms: '5 phòng', price: '99.000đ', period: '/tháng', features: ['Tối đa 5 phòng', 'QR check-in tự động', 'Nhật ký chăm sóc', 'Diary link cho khách'], highlight: false, cta: 'Đăng ký ngay' },
-  { name: 'Chuyên nghiệp', rooms: '15 phòng', price: '199.000đ', period: '/tháng', features: ['Tối đa 15 phòng', 'Tất cả tính năng Cơ bản', 'Quản lý nhân viên', 'Thống kê doanh thu'], highlight: true, cta: 'Đăng ký ngay', badge: 'Phổ biến nhất' },
-  { name: 'Không giới hạn', rooms: '999 phòng', price: '499.000đ', period: '/tháng', features: ['Không giới hạn phòng', 'Tất cả tính năng Pro', 'Logo & thương hiệu riêng', 'Hỗ trợ ưu tiên'], highlight: false, cta: 'Đăng ký ngay' },
-];
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
+
+type PlanData = { id: number; name: string; display_name: string; price: number; max_rooms: number; description: string };
+
 
 const faqs = [
   {
@@ -37,6 +37,18 @@ const faqs = [
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [plans, setPlans] = useState<PlanData[]>([]);
+  const [extraRoomPrice, setExtraRoomPrice] = useState(0);
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`${API_URL}/payment/plans`).then(r => r.json()),
+      fetch(`${API_URL}/payment/extra-room-price`).then(r => r.json()),
+    ]).then(([p, ep]) => {
+      setPlans(p);
+      setExtraRoomPrice(ep.price);
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0f172a]">
@@ -352,43 +364,67 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
-            {pricingPlans.map((plan) => (
-              <div key={plan.name}
-                className={`relative rounded-2xl p-5 sm:p-6 border transition-all hover:-translate-y-1 duration-300 ${
-                  plan.highlight
-                    ? 'border-teal-500 bg-teal-500/10 shadow-xl shadow-teal-500/10 sm:scale-[1.03]'
-                    : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
-                }`}>
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-teal-500 text-white text-xs font-bold whitespace-nowrap">
-                    <Star size={14} className="text-teal-300 inline" /> {plan.badge}
-                  </div>
-                )}
-                <h3 className="text-lg sm:text-xl font-bold mb-1">{plan.name}</h3>
-                <p className="text-sm text-slate-500 mb-3">{plan.rooms}</p>
-                <div className="mb-5 sm:mb-6">
-                  <span className="text-2xl sm:text-3xl font-bold text-white">{plan.price}</span>
-                  <span className="text-slate-500 text-sm">{plan.period}</span>
-                </div>
-                <ul className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
-                  {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                      <span className="text-green-400 mt-0.5">✓</span>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register"
-                  className={`block text-center py-2.5 sm:py-3 rounded-xl font-medium transition-colors text-sm sm:text-base ${
-                    plan.highlight
-                      ? 'bg-teal-600 hover:bg-teal-500 text-white'
-                      : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
+            {plans.map((plan, idx) => {
+              const isPopular = plan.name === 'pro';
+              const features = [
+                `Tối đa ${plan.max_rooms} phòng`,
+                'QR check-in tự động',
+                'Nhật ký chăm sóc',
+                'Quản lý booking',
+                ...(idx >= 1 ? ['Quản lý nhân viên', 'Thống kê doanh thu'] : []),
+                ...(idx >= 2 ? ['Hỗ trợ ưu tiên'] : []),
+              ];
+
+              return (
+                <div key={plan.id}
+                  className={`relative rounded-2xl p-5 sm:p-6 border transition-all hover:-translate-y-1 duration-300 ${
+                    isPopular
+                      ? 'border-teal-500 bg-teal-500/10 shadow-xl shadow-teal-500/10 sm:scale-[1.03]'
+                      : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
                   }`}>
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
+                  {isPopular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-teal-500 text-white text-xs font-bold whitespace-nowrap">
+                      <Star size={14} className="text-teal-300 inline" /> Phổ biến nhất
+                    </div>
+                  )}
+                  <h3 className="text-lg sm:text-xl font-bold mb-1">{plan.display_name}</h3>
+                  <p className="text-sm text-slate-500 mb-3">{plan.description}</p>
+                  <div className="mb-5 sm:mb-6">
+                    <span className="text-2xl sm:text-3xl font-bold text-white">{fmt(plan.price)}</span>
+                    <span className="text-slate-500 text-sm">/tháng</span>
+                  </div>
+                  <ul className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
+                    {features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                        <span className="text-green-400 mt-0.5">✓</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/register"
+                    className={`block text-center py-2.5 sm:py-3 rounded-xl font-medium transition-colors text-sm sm:text-base ${
+                      isPopular
+                        ? 'bg-teal-600 hover:bg-teal-500 text-white'
+                        : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
+                    }`}>
+                    Đăng ký ngay
+                  </Link>
+                </div>
+              );
+            })}
           </div>
+
+          {/* Extra rooms info */}
+          {extraRoomPrice > 0 && (
+            <div className="mt-8 text-center">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 border border-purple-500/20">
+                <Plus size={14} className="text-purple-400" />
+                <span className="text-sm text-purple-300">
+                  Cần thêm phòng? Mua bổ sung với giá chỉ <strong className="text-white">{fmt(extraRoomPrice)}</strong>/phòng/tháng
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
