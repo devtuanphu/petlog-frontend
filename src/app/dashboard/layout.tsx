@@ -112,7 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="text-xs text-slate-500 truncate">{user.email}</p>
             </div>
           </div>
-          <a href="/PetLog - Hướng Dẫn Sử Dụng.pdf" target="_blank"
+          <a href="/PetLog - Huong Dan Su Dung.html" target="_blank"
             className="w-full py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800 hover:text-teal-400 transition-colors flex items-center justify-center gap-2">
             <FileText size={14} />
             Hướng dẫn sử dụng

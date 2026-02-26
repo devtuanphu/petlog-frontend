@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PetLog - Hướng Dẫn Sử Dụng</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+  .container { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+  
+  /* Header */
+  .header { text-align: center; margin-bottom: 60px; padding: 40px 20px; background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); border-radius: 24px; }
+  .header h1 { font-size: 32px; font-weight: 800; color: white; margin-bottom: 8px; }
+  .header .subtitle { font-size: 16px; color: #99f6e4; }
+  .header .version { font-size: 12px; color: #5eead4; margin-top: 12px; opacity: 0.8; }
+  .logo-text { font-size: 40px; margin-bottom: 12px; }
+  
+  /* Section */
+  .section { margin-bottom: 56px; }
+  .section-number { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #14b8a6; color: white; border-radius: 50%; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .section h2 { font-size: 24px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+  .section .desc { color: #94a3b8; font-size: 15px; margin-bottom: 20px; }
+  
+  /* Steps */
+  .steps { counter-reset: step; }
+  .step { position: relative; padding: 16px 0 16px 36px; border-left: 2px solid #334155; margin-left: 17px; }
+  .step::before { counter-increment: step; content: counter(step); position: absolute; left: -13px; top: 16px; width: 26px; height: 26px; background: #1e293b; border: 2px solid #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #14b8a6; }
+  .step:last-child { border-left-color: transparent; }
+  .step h3 { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+  .step p { font-size: 14px; color: #94a3b8; }
+  
+  /* Screenshot */
+  .screenshot { margin: 16px 0; text-align: center; }
+  .screenshot img { max-width: 360px; width: 100%; border-radius: 16px; border: 2px solid #334155; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .screenshot .caption { font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic; }
+  
+  /* Tip box */
+  .tip { background: #14b8a6; background: linear-gradient(135deg, rgba(20,184,166,0.15), rgba(20,184,166,0.05)); border: 1px solid rgba(20,184,166,0.3); border-radius: 12px; padding: 16px 20px; margin: 16px 0; }
+  .tip::before { content: '💡 '; }
+  .tip.warning { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border-color: rgba(245,158,11,0.3); }
+  .tip.warning::before { content: '⚠️ '; }
+  
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #1e293b; font-size: 14px; }
+  th { background: #1e293b; color: #94a3b8; font-weight: 600; }
+  td { color: #cbd5e1; }
+  
+  /* Divider */
+  hr { border: none; height: 1px; background: #1e293b; margin: 40px 0; }
+  
+  /* Footer */
+  .footer { text-align: center; padding: 40px 20px; color: #64748b; font-size: 13px; }
+  .footer a { color: #14b8a6; text-decoration: none; }
+  
+  /* Badge */
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+  .badge-green { background: rgba(20,184,166,0.2); color: #5eead4; }
+  .badge-blue { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .badge-yellow { background: rgba(245,158,11,0.2); color: #fcd34d; }
+  
+  @media print {
+    body { background: white; color: #1e293b; }
+    .header { background: #0d9488 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .screenshot img { max-width: 300px; border-color: #e2e8f0; }
+    .step { border-left-color: #e2e8f0; }
+    .section h2 { color: #1e293b; }
+    .step h3 { color: #334155; }
+    .step p, .desc { color: #64748b; }
+    th { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-text">🐾</div>
+    <h1>PetLog</h1>
+    <div class="subtitle">Hướng Dẫn Sử Dụng Chi Tiết</div>
+    <div class="version">Phiên bản 1.0 — Cập nhật 26/02/2026</div>
+  </div>
+
+  <!-- MỤC LỤC -->
+  <div class="section">
+    <h2>📋 Mục lục</h2>
+    <ol style="padding-left:20px; color:#94a3b8; font-size:15px; line-height:2.2">
+      <li>Đăng ký tài khoản</li>
+      <li>Đăng nhập</li>
+      <li>Thiết lập phòng ban đầu</li>
+      <li>Tổng quan Dashboard</li>
+      <li>Quản lý phòng</li>
+      <li>Khách check-in qua QR</li>
+      <li>Quản lý lượt gửi (Bookings)</li>
+      <li>Ghi nhật ký chăm sóc</li>
+      <li>Khách xem Diary</li>
+      <li>Nâng cấp gói</li>
+    </ol>
+  </div>
+
+  <hr>
+
+  <!-- 1. ĐĂNG KÝ -->
+  <div class="section">
+    <div class="section-number">1</div>
+    <h2>Đăng ký tài khoản</h2>
+    <p class="desc">Tạo tài khoản miễn phí chỉ trong 1 phút. Bạn được dùng thử 7 ngày đầy đủ tính năng.</p>
+    
+    <div class="steps">
+      <div class="step">
+        <h3>Truy cập trang đăng ký</h3>
+        <p>Mở trình duyệt → vào <strong>petlogvn.com</strong> → nhấn <strong>"Dùng thử miễn phí"</strong></p>
+        <div class="screenshot">
+          <img src="guide/01-landing.png" alt="Landing page">
+          <div class="caption">Trang chủ PetLog</div>
+        </div>
+      </div>
+      <div class="step">
+        <h3>Điền thông tin</h3>
+        <p>Nhập họ tên, email, mật khẩu và tên cửa hàng Pet Hotel của bạn. Các trường có dấu * là bắt buộc.</p>
+        <div class="screenshot">
+          <img src="guide/02-register.png" alt="Đăng ký">
+          <div class="caption">Form đăng ký — điền đầy đủ thông tin</div>
+        </div>
+      </div>
+      <div class="step">
+        <h3>Nhấn "Tạo tài khoản"</h3>
+        <p>Hệ thống sẽ tự động tạo tài khoản và chuyển bạn vào Dashboard.</p>
+      </div>
+    </div>
+    
+    <div class="tip">Sau khi đăng ký, bạn có <strong>7 ngày dùng thử miễn phí</strong> với đầy đủ tính năng.</div>
+  </div>
+
+  <hr>
+
+  <!-- 2. ĐĂNG NHẬP -->
+  <div class="section">
+    <div class="section-number">2</div>
+    <h2>Đăng nhập</h2>
+    <p class="desc">Nếu đã có tài khoản, đăng nhập bằng email và mật khẩu đã đăng ký.</p>
+    
+    <div class="screenshot">
+      <img src="guide/03-login.png" alt="Đăng nhập">
+      <div class="caption">Trang đăng nhập</div>
+    </div>
+    
+    <div class="tip">Nếu quên mật khẩu, liên hệ hỗ trợ qua Zalo để được reset.</div>
+  </div>
+
+  <hr>
+
+  <!-- 3. THIẾT LẬP PHÒNG -->
+  <div class="section">
+    <div class="section-number">3</div>
+    <h2>Thiết lập phòng ban đầu</h2>
+    <p class="desc">Lần đầu đăng nhập, hệ thống sẽ hướng dẫn bạn tạo phòng và sinh mã QR.</p>
+    
+    <div class="steps">
+      <div class="step">
+        <h3>Chọn số phòng cần tạo</h3>
+        <p>Hệ thống gợi ý tạo nhanh 3 phòng. Bạn có thể thêm/sửa sau.</p>
+        <div class="screenshot">
+          <img src="guide/04-onboarding.png" alt="Onboarding">
+          <div class="caption">Wizard thiết lập phòng ban đầu</div>
+        </div>
+      </div>
+      <div class="step">
+        <h3>Mã QR tự động sinh</h3>
+        <p>Mỗi phòng sẽ có 1 mã QR riêng. In ra và dán tại phòng để khách quét check-in.</p>
+      </div>
+    </div>
+    
+    <div class="tip">Bạn có thể in QR bằng cách nhấn vào phòng → <strong>"In QR"</strong> hoặc tải về dạng ảnh.</div>
+  </div>
+
+  <hr>
+
+  <!-- 4. DASHBOARD -->
+  <div class="section">
+    <div class="section-number">4</div>
+    <h2>Tổng quan Dashboard</h2>
+    <p class="desc">Xem nhanh tình trạng hoạt động: phòng trống, phòng đang có pet, quá hạn.</p>
+    
+    <div class="screenshot">
+      <img src="guide/05-dashboard.png" alt="Dashboard">
+      <div class="caption">Dashboard — 2 phòng, 1 pet đang gửi</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Thống kê nhanh</h3>
+        <p><strong>Tổng phòng</strong> — số phòng đã tạo<br>
+        <strong>Phòng trống</strong> — phòng chưa có pet<br>
+        <strong>Đang có pet</strong> — phòng đang hoạt động<br>
+        <strong>Quá hạn</strong> — pet quá ngày checkout</p>
+      </div>
+      <div class="step">
+        <h3>Sơ đồ phòng</h3>
+        <p>Hiển thị trực quan từng phòng: tên pet, tên chủ, trạng thái. Nhấn vào phòng đang có pet để xem diary.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 5. QUẢN LÝ PHÒNG -->
+  <div class="section">
+    <div class="section-number">5</div>
+    <h2>Quản lý phòng</h2>
+    <p class="desc">Thêm, xóa phòng và quản lý mã QR check-in.</p>
+    
+    <div class="screenshot">
+      <img src="guide/06-rooms.png" alt="Quản lý phòng">
+      <div class="caption">Danh sách phòng với trạng thái</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Thêm phòng mới</h3>
+        <p>Nhập tên phòng (VD: "Phòng VIP 01") → nhấn <strong>"Thêm phòng"</strong>. Mã QR tự động sinh.</p>
+      </div>
+      <div class="step">
+        <h3>Xem & In QR</h3>
+        <p>Nhấn vào phòng → hiện mã QR. Nhấn <strong>"In QR"</strong> để in, hoặc <strong>"Copy link"</strong> để gửi cho khách.</p>
+      </div>
+      <div class="step">
+        <h3>Xóa phòng</h3>
+        <p>Nhấn nút xóa 🗑️ bên cạnh phòng. Chỉ xóa được phòng trống (không có pet đang gửi).</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 6. CHECK-IN -->
+  <div class="section">
+    <div class="section-number">6</div>
+    <h2>Khách check-in qua QR</h2>
+    <p class="desc">Khách hàng quét mã QR tại phòng để tự check-in pet mà không cần cài app.</p>
+    
+    <div class="steps">
+      <div class="step">
+        <h3>Khách quét QR</h3>
+        <p>Khách dùng camera điện thoại quét mã QR dán tại phòng. Trang check-in tự động mở trong trình duyệt.</p>
+      </div>
+      <div class="step">
+        <h3>Điền thông tin pet</h3>
+        <p>Khách nhập: Số điện thoại, Tên chủ, Tên pet, Loại pet, ngày checkout dự kiến.</p>
+      </div>
+      <div class="step">
+        <h3>Xác nhận check-in</h3>
+        <p>Nhấn <strong>"Check-in"</strong>. Hệ thống tạo booking và sinh link diary riêng cho pet.</p>
+        <div class="screenshot">
+          <img src="guide/08-checkin.png" alt="Check-in thành công">
+          <div class="caption">Check-in thành công — khách nhận link diary để theo dõi bé</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tip">Khách nhận <strong>Link diary</strong> ngay sau check-in. Mở link bất kỳ lúc nào để xem quá trình chăm sóc bé.</div>
+  </div>
+
+  <hr>
+
+  <!-- 7. BOOKINGS -->
+  <div class="section">
+    <div class="section-number">7</div>
+    <h2>Quản lý lượt gửi (Bookings)</h2>
+    <p class="desc">Xem danh sách tất cả pet đang gửi và đã checkout.</p>
+    
+    <div class="screenshot">
+      <img src="guide/11-bookings.png" alt="Bookings">
+      <div class="caption">Danh sách lượt gửi — Lu Lu đang ở Room 101</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Xem thông tin booking</h3>
+        <p>Mỗi booking hiển thị: tên pet, tên chủ, phòng, ngày check-in/checkout, trạng thái.</p>
+      </div>
+      <div class="step">
+        <h3>Checkout pet</h3>
+        <p>Khi khách đến lấy pet → nhấn <strong>"Checkout"</strong> để trả phòng. Phòng sẽ chuyển về trạng thái trống.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 8. NHẬT KÝ -->
+  <div class="section">
+    <div class="section-number">8</div>
+    <h2>Ghi nhật ký chăm sóc</h2>
+    <p class="desc">Cập nhật hoạt động chăm sóc cho từng pet. Khách hàng xem được qua link diary.</p>
+    
+    <div class="screenshot">
+      <img src="guide/09-diary.png" alt="Nhật ký">
+      <div class="caption">Nhật ký — đã ghi "Cho ăn: Bé ăn ngon, chơi vui."</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Chọn pet cần ghi</h3>
+        <p>Vào tab <strong>"Nhật ký"</strong> → nhấn chọn pet cần cập nhật.</p>
+      </div>
+      <div class="step">
+        <h3>Thêm nhật ký</h3>
+        <p>Nhấn <strong>"Thêm nhật ký"</strong> → chọn loại (Cho ăn, Tắm, Dạo chơi, Sức khoẻ...) → nhập mô tả → có thể đính kèm ảnh/video.</p>
+      </div>
+      <div class="step">
+        <h3>Gửi nhật ký</h3>
+        <p>Nhấn <strong>"Ghi nhật ký"</strong>. Khách hàng sẽ thấy cập nhật ngay trên link diary của họ.</p>
+      </div>
+    </div>
+    
+    <div class="tip">Ghi nhật ký thường xuyên giúp khách yên tâm và tăng uy tín cho cửa hàng! 🌟</div>
+  </div>
+
+  <hr>
+
+  <!-- 9. KHÁCH XEM DIARY -->
+  <div class="section">
+    <div class="section-number">9</div>
+    <h2>Khách xem Diary</h2>
+    <p class="desc">Khách hàng mở link diary nhận được lúc check-in để theo dõi tình trạng pet realtime.</p>
+    
+    <div class="steps">
+      <div class="step">
+        <h3>Mở link diary</h3>
+        <p>Link có dạng: <code>petlogvn.com/diary/abc123...</code>. Không cần đăng nhập, không cần cài app.</p>
+      </div>
+      <div class="step">
+        <h3>Xem lịch sử chăm sóc</h3>
+        <p>Tất cả nhật ký được hiển thị theo dòng thời gian: giờ cho ăn, tắm, ảnh/video, ghi chú sức khoẻ...</p>
+      </div>
+    </div>
+    
+    <div class="tip">Khách có thể chia sẻ link diary cho người thân để cùng theo dõi bé!</div>
+  </div>
+
+  <hr>
+
+  <!-- 10. QR SCANNER -->
+  <div class="section">
+    <div class="section-number">10</div>
+    <h2>Quét QR nhanh (Cho nhân viên)</h2>
+    <p class="desc">Nhân viên quét QR phòng để mở nhanh diary và cập nhật tình trạng pet.</p>
+    
+    <div class="screenshot">
+      <img src="guide/07-scan.png" alt="Quét QR">
+      <div class="caption">Trang quét QR — mở camera hoặc nhập link thủ công</div>
+    </div>
+    
+    <div class="steps">
+      <div class="step">
+        <h3>Mở camera quét</h3>
+        <p>Vào tab <strong>"Quét QR"</strong> → nhấn <strong>"Mở camera quét QR"</strong> → hướng camera vào mã QR phòng.</p>
+      </div>
+      <div class="step">
+        <h3>Tự động mở diary</h3>
+        <p>Sau khi quét, hệ thống tự tìm pet đang ở phòng đó và mở trang diary để bạn cập nhật ngay.</p>
+      </div>
+    </div>
+    
+    <div class="tip">Nếu camera không hoạt động, dùng ô <strong>"Nhập link thủ công"</strong> bên dưới.</div>
+  </div>
+
+  <hr>
+
+  <!-- 11. NÂNG CẤP -->
+  <div class="section">
+    <div class="section-number">11</div>
+    <h2>Nâng cấp gói</h2>
+    <p class="desc">Chọn gói phù hợp khi hết thời gian dùng thử hoặc cần thêm phòng.</p>
+    
+    <div class="screenshot">
+      <img src="guide/10-pricing.png" alt="Bảng giá">
+      <div class="caption">Bảng giá — chọn gói và thanh toán trực tuyến</div>
+    </div>
+
+    <table>
+      <tr><th>Gói</th><th>Phòng</th><th>Giá</th></tr>
+      <tr><td><strong>Cơ bản</strong></td><td>Tối đa 5 phòng</td><td>99.000đ/tháng</td></tr>
+      <tr><td><strong>Chuyên nghiệp</strong> <span class="badge badge-green">Phổ biến</span></td><td>Tối đa 15 phòng</td><td>199.000đ/tháng</td></tr>
+      <tr><td><strong>Không giới hạn</strong></td><td>999 phòng</td><td>499.000đ/tháng</td></tr>
+    </table>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Chọn gói & thời hạn</h3>
+        <p>Chọn 1 tháng, 3 tháng, 6 tháng hoặc 12 tháng (giảm 10%). Thanh toán qua PayOS (QR ngân hàng).</p>
+      </div>
+      <div class="step">
+        <h3>Nâng cấp giữa kỳ</h3>
+        <p>Nếu đang dùng gói thấp hơn, bạn chỉ trả <strong>chênh lệch theo số ngày còn lại</strong>. Ví dụ: còn 20 ngày, chỉ trả phần chênh lệch cho 20 ngày đó.</p>
+      </div>
+    </div>
+    
+    <div class="tip">Thanh toán an toàn qua PayOS — hỗ trợ mọi ngân hàng tại Việt Nam 🇻🇳</div>
+  </div>
+
+  <hr>
+
+  <!-- QUY TRÌNH TÓM TẮT -->
+  <div class="section">
+    <h2>🔄 Quy trình vận hành hàng ngày</h2>
+    <p class="desc">Tóm tắt các bước vận hành sau khi đã thiết lập xong.</p>
+    
+    <table>
+      <tr><th>#</th><th>Bước</th><th>Ai làm?</th></tr>
+      <tr><td>1</td><td>Khách quét QR tại phòng → tự check-in</td><td>Khách</td></tr>
+      <tr><td>2</td><td>Pet hiện trên Dashboard → bắt đầu chăm sóc</td><td>Tự động</td></tr>
+      <tr><td>3</td><td>Nhân viên ghi nhật ký (ăn, tắm, chơi...)</td><td>Nhân viên</td></tr>
+      <tr><td>4</td><td>Khách mở link diary → xem realtime</td><td>Khách</td></tr>
+      <tr><td>5</td><td>Khi khách đến lấy → nhấn Checkout</td><td>Nhân viên</td></tr>
+    </table>
+  </div>
+
+  <hr>
+
+  <!-- HỖ TRỢ -->
+  <div class="section">
+    <h2>📞 Hỗ trợ</h2>
+    <p class="desc">Cần hỗ trợ? Liên hệ qua các kênh sau:</p>
+    <table>
+      <tr><td>🌐 Website</td><td><strong>petlogvn.com</strong></td></tr>
+      <tr><td>💬 Zalo</td><td>Chat trực tiếp qua nút Zalo trên app</td></tr>
+      <tr><td>📧 Email</td><td>support@petlogvn.com</td></tr>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>© 2026 PetLog — Quản lý Pet Hotel thông minh</p>
+    <p style="margin-top: 8px;"><a href="https://petlogvn.com">petlogvn.com</a></p>
+  </div>
+
+</div>
+</body>
+</html>

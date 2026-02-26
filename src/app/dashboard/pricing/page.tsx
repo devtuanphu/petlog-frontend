@@ -67,13 +67,15 @@ export default function PricingPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Check payment return
+  // Check payment return & reload to refresh subscription
   useEffect(() => {
     const orderCode = searchParams.get('orderCode');
-    if (orderCode) {
-      api.checkPayment(orderCode).catch(() => {});
+    if (orderCode && !status) {
+      api.checkPayment(orderCode).then(() => {
+        window.location.href = '/dashboard/pricing?status=success';
+      }).catch(() => {});
     }
-  }, [searchParams]);
+  }, [searchParams, status]);
 
   // Calculate upgrade cost when hovering/selecting a plan (for paid users)
   const calcUpgrade = useCallback(async (planName: string) => {

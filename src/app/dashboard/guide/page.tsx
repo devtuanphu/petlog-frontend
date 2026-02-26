@@ -11,7 +11,7 @@ export default function GuidePage() {
       <p className="text-sm text-slate-400 mb-6">Hướng dẫn chi tiết cách sử dụng PetLog cho chủ khách sạn & nhân viên</p>
 
       {/* Download PDF */}
-      <a href="/PetLog - Hướng Dẫn Sử Dụng.pdf" target="_blank"
+      <a href="/PetLog - Huong Dan Su Dung.html" target="_blank"
         className="flex items-center gap-4 p-5 rounded-2xl bg-teal-600/10 border border-teal-500/30 hover:bg-teal-600/20 transition-colors mb-6 group">
         <div className="w-14 h-14 rounded-xl bg-teal-600/20 flex items-center justify-center shrink-0">
           <Download size={28} className="text-teal-400" />

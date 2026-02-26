@@ -6,10 +6,9 @@ import { useState } from 'react';
 import { PawPrint, UtensilsCrossed, ClipboardEdit, Printer, Sparkles, ShieldCheck, Clock, Heart, Star, MessageCircle, Check, Menu, X } from 'lucide-react';
 
 const pricingPlans = [
-  { name: 'Free', rooms: '3 phòng', price: '0đ', period: 'mãi mãi', features: ['Tối đa 3 phòng', 'QR check-in tự động', 'Nhật ký chăm sóc', 'Diary link cho khách'], highlight: false, cta: 'Bắt đầu miễn phí' },
-  { name: 'Basic', rooms: '10 phòng', price: '199.000đ', period: '/tháng', features: ['Tối đa 10 phòng', 'Tất cả tính năng Free', 'Hỗ trợ ưu tiên qua Zalo', 'Xuất báo cáo'], highlight: false, cta: 'Liên hệ mua' },
-  { name: 'Pro', rooms: '30 phòng', price: '499.000đ', period: '/tháng', features: ['Tối đa 30 phòng', 'Tất cả tính năng Basic', 'Logo & thương hiệu riêng', 'Thống kê doanh thu'], highlight: true, cta: 'Liên hệ mua', badge: 'Phổ biến nhất' },
-  { name: 'Unlimited', rooms: 'Không giới hạn', price: '999.000đ', period: '/tháng', features: ['Không giới hạn phòng', 'Tất cả tính năng Pro', 'API tích hợp', 'Hỗ trợ 1-1 riêng'], highlight: false, cta: 'Liên hệ mua' },
+  { name: 'Cơ bản', rooms: '5 phòng', price: '99.000đ', period: '/tháng', features: ['Tối đa 5 phòng', 'QR check-in tự động', 'Nhật ký chăm sóc', 'Diary link cho khách'], highlight: false, cta: 'Đăng ký ngay' },
+  { name: 'Chuyên nghiệp', rooms: '15 phòng', price: '199.000đ', period: '/tháng', features: ['Tối đa 15 phòng', 'Tất cả tính năng Cơ bản', 'Quản lý nhân viên', 'Thống kê doanh thu'], highlight: true, cta: 'Đăng ký ngay', badge: 'Phổ biến nhất' },
+  { name: 'Không giới hạn', rooms: '999 phòng', price: '499.000đ', period: '/tháng', features: ['Không giới hạn phòng', 'Tất cả tính năng Pro', 'Logo & thương hiệu riêng', 'Hỗ trợ ưu tiên'], highlight: false, cta: 'Đăng ký ngay' },
 ];
 
 const faqs = [
@@ -105,7 +104,7 @@ export default function LandingPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs sm:text-sm mb-4 sm:mb-6">
                 <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                Miễn phí trọn đời cho 3 phòng
+                Dùng thử 7 ngày miễn phí
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6">
@@ -349,10 +348,10 @@ export default function LandingPage() {
           <div className="text-center mb-10 sm:mb-16">
             <p className="text-teal-400 font-semibold text-sm uppercase tracking-widest mb-3">Đơn giản & minh bạch</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Bảng giá</h2>
-            <p className="text-slate-400 mt-3 text-sm sm:text-base">Bắt đầu miễn phí, nâng cấp khi hotel của bạn phát triển</p>
+            <p className="text-slate-400 mt-3 text-sm sm:text-base">Dùng thử 7 ngày miễn phí, nâng cấp trực tiếp khi cần</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
             {pricingPlans.map((plan) => (
               <div key={plan.name}
                 className={`relative rounded-2xl p-5 sm:p-6 border transition-all hover:-translate-y-1 duration-300 ${
@@ -429,7 +428,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-base sm:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto">
               Tham gia cùng hàng chục pet hotel đã tin dùng PetLog. 
-              Setup trong 5 phút, miễn phí trọn đời cho 3 phòng.
+              Setup trong 5 phút, dùng thử 7 ngày miễn phí.
             </p>
 
             <Link href="/register"
@@ -438,7 +437,7 @@ export default function LandingPage() {
             </Link>
 
             <p className="text-xs sm:text-sm text-slate-500 mt-4">Không cần thẻ tín dụng · Hủy bất cứ lúc nào</p>
-            <a href="/PetLog - Hướng Dẫn Sử Dụng.pdf" target="_blank" className="inline-block mt-3 text-xs sm:text-sm text-teal-400 hover:text-teal-300 underline underline-offset-2 transition-colors">📄 Xem hướng dẫn sử dụng</a>
+            <a href="/PetLog - Huong Dan Su Dung.html" target="_blank" className="inline-block mt-3 text-xs sm:text-sm text-teal-400 hover:text-teal-300 underline underline-offset-2 transition-colors">📄 Xem hướng dẫn sử dụng</a>
           </div>
         </div>
       </section>
@@ -452,7 +451,7 @@ export default function LandingPage() {
             <span className="text-xs sm:text-sm text-slate-500 italic">Chăm sóc tận tâm — Công nghệ xứng tầm</span>
           </div>
           <div className="flex items-center gap-4">
-            <a href="/PetLog - Hướng Dẫn Sử Dụng.pdf" target="_blank" className="text-xs sm:text-sm text-slate-400 hover:text-teal-400 transition-colors">📄 Hướng dẫn</a>
+            <a href="/PetLog - Huong Dan Su Dung.html" target="_blank" className="text-xs sm:text-sm text-slate-400 hover:text-teal-400 transition-colors">📄 Hướng dẫn</a>
             <p className="text-xs sm:text-sm text-slate-600">© 2026 PetLog. All rights reserved.</p>
           </div>
         </div>

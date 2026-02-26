@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ScanLine, Camera, XCircle, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import jsQR from 'jsqr';
 
 export default function ScanPage() {
   const router = useRouter();
@@ -16,68 +17,24 @@ export default function ScanPage() {
   const [processing, setProcessing] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
   const animFrameRef = useRef<number>(0);
+  const foundRef = useRef(false);
+  const scanFrameRef = useRef<() => void>(() => {});
 
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
       streamRef.current = null;
     }
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = 0;
     }
     setScanning(false);
-  };
+  }, []);
 
-  const startCamera = async () => {
-    setError('');
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-        setScanning(true);
-        scanQR();
-      }
-    } catch {
-      setError('Không thể truy cập camera. Cần HTTPS hoặc localhost để sử dụng camera.');
-    }
-  };
-
-  const scanQR = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const tick = () => {
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        try {
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          if ('BarcodeDetector' in window) {
-            const detector = new (window as unknown as { BarcodeDetector: new (opts: { formats: string[] }) => { detect: (source: ImageData) => Promise<{ rawValue: string }[]> } }).BarcodeDetector({ formats: ['qr_code'] });
-            detector.detect(imageData).then((codes: { rawValue: string }[]) => {
-              if (codes.length > 0) {
-                handleQRResult(codes[0].rawValue);
-              }
-            }).catch(() => { /* ignore */ });
-          }
-        } catch { /* ignore */ }
-      }
-      animFrameRef.current = requestAnimationFrame(tick);
-    };
-    tick();
-  };
-
-  const handleQRResult = async (value: string) => {
+  const handleQRResult = useCallback(async (value: string) => {
+    if (foundRef.current) return;
+    foundRef.current = true;
     stopCamera();
     setProcessing(true);
 
@@ -92,12 +49,12 @@ export default function ScanPage() {
     if (!qrToken || qrToken.length < 6) {
       setError(`QR không hợp lệ: ${value}`);
       setProcessing(false);
+      foundRef.current = false;
       return;
     }
 
     try {
       const roomInfo = await api.getRoomInfo(qrToken);
-
       if (roomInfo.active_booking?.diary_token) {
         router.push(`/dashboard/diary/${roomInfo.active_booking.diary_token}`);
       } else {
@@ -107,6 +64,86 @@ export default function ScanPage() {
       router.push(`/room/${qrToken}`);
     }
     setProcessing(false);
+  }, [stopCamera, router]);
+
+  // Set up scanFrame using ref to avoid declaration order issues
+  useEffect(() => {
+    scanFrameRef.current = () => {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas || foundRef.current) return;
+      if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+        animFrameRef.current = requestAnimationFrame(scanFrameRef.current);
+        return;
+      }
+
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      try {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+        if (code?.data) {
+          handleQRResult(code.data);
+          return;
+        }
+      } catch { /* ignore */ }
+
+      animFrameRef.current = requestAnimationFrame(scanFrameRef.current);
+    };
+  }, [handleQRResult]);
+
+  const startCamera = async () => {
+    setError('');
+    foundRef.current = false;
+
+    // Check HTTPS (allow localhost and private IPs for dev)
+    if (typeof window !== 'undefined' && location.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(location.hostname) && !location.hostname.startsWith('192.168.')) {
+      setError('Camera cần HTTPS. Trang web phải chạy trên HTTPS để sử dụng camera.');
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError('Trình duyệt không hỗ trợ camera. Vui lòng dùng Chrome hoặc Safari.');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+      });
+      streamRef.current = stream;
+      setScanning(true);
+
+      // Wait for React to render the video element
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current?.play().then(() => {
+              requestAnimationFrame(scanFrameRef.current);
+            }).catch(() => {
+              setError('Không thể phát video camera.');
+            });
+          };
+        }
+      }, 100);
+    } catch (err: unknown) {
+      const e = err as { name?: string };
+      if (e.name === 'NotAllowedError') {
+        setError('Bạn đã từ chối quyền camera. Vui lòng cho phép camera trong cài đặt trình duyệt.');
+      } else if (e.name === 'NotFoundError') {
+        setError('Không tìm thấy camera trên thiết bị này.');
+      } else {
+        setError('Không thể truy cập camera. Vui lòng kiểm tra quyền camera.');
+      }
+    }
   };
 
   const [manualToken, setManualToken] = useState('');
@@ -120,7 +157,7 @@ export default function ScanPage() {
 
   useEffect(() => {
     return () => stopCamera();
-  }, []);
+  }, [stopCamera]);
 
   return (
     <div className="max-w-lg mx-auto">
@@ -134,7 +171,7 @@ export default function ScanPage() {
       </p>
 
       {/* Camera view */}
-      <div className="relative rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 mb-4 aspect-[4/3]">
+      <div className="relative rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 mb-4 aspect-4/3">
         {processing ? (
           <div className="flex flex-col items-center justify-center h-full py-12">
             <div className="animate-spin w-8 h-8 border-2 border-teal-400 border-t-transparent rounded-full mb-3" />
@@ -142,7 +179,7 @@ export default function ScanPage() {
           </div>
         ) : scanning ? (
           <>
-            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted autoPlay />
             {/* Scan frame overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-48 h-48 border-2 border-teal-400 rounded-2xl relative">
