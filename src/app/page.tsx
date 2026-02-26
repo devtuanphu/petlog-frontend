@@ -364,15 +364,14 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
-            {plans.map((plan, idx) => {
+            {plans.map((plan) => {
               const isPopular = plan.name === 'pro';
               const features = [
                 `Tối đa ${plan.max_rooms} phòng`,
+                'Quản lý booking',
                 'QR check-in tự động',
                 'Nhật ký chăm sóc',
-                'Quản lý booking',
-                ...(idx >= 1 ? ['Quản lý nhân viên', 'Thống kê doanh thu'] : []),
-                ...(idx >= 2 ? ['Hỗ trợ ưu tiên'] : []),
+                'Diary link cho khách',
               ];
 
               return (
