@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { PawPrint, UtensilsCrossed, ClipboardEdit, Printer, Sparkles, ShieldCheck, Clock, Heart, Star, MessageCircle, Check, Menu, X, Plus } from 'lucide-react';
+import { PawPrint, UtensilsCrossed, ClipboardEdit, Printer, Sparkles, ShieldCheck, Clock, Heart, Star, MessageCircle, Check, Menu, X, Plus, Quote, Monitor, Headphones, Globe, Lock } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
@@ -63,8 +63,10 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8 text-sm text-slate-400">
             <a href="#steps" className="hover:text-white transition-colors">Cách hoạt động</a>
             <a href="#features" className="hover:text-white transition-colors">Tại sao PetLog</a>
+            <a href="#testimonials" className="hover:text-white transition-colors">Đánh giá</a>
             <a href="#pricing" className="hover:text-white transition-colors">Bảng giá</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+            <a href="/PetLog - Huong Dan Su Dung.html" target="_blank" className="hover:text-teal-400 transition-colors">📄 Hướng dẫn</a>
           </div>
 
           {/* Desktop buttons */}
@@ -90,8 +92,10 @@ export default function LandingPage() {
           <div className="px-4 py-4 space-y-1">
             <a href="#steps" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors">Cách hoạt động</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors">Tại sao PetLog</a>
+            <a href="#testimonials" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors">Đánh giá</a>
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors">Bảng giá</a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors">FAQ</a>
+            <a href="/PetLog - Huong Dan Su Dung.html" target="_blank" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 rounded-lg text-teal-400 hover:bg-white/5 transition-colors">📄 Hướng dẫn sử dụng</a>
             <div className="border-t border-white/5 pt-3 mt-3 flex gap-3">
               <Link href="/login" className="flex-1 text-center py-2.5 rounded-lg text-sm text-slate-300 border border-slate-700 hover:bg-white/5 transition-colors">
                 Đăng nhập
@@ -215,10 +219,10 @@ export default function LandingPage() {
       <div className="border-y border-slate-800 bg-slate-900/50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-center">
           {[
-            { num: '50+', label: 'Pet Hotels đang dùng' },
-            { num: '500+', label: 'Pet đã check-in' },
-            { num: '2000+', label: 'Logs chăm sóc' },
-            { num: '4.9', label: 'Đánh giá trung bình' },
+            { num: '50+', label: 'Pet Hotel tin dùng' },
+            { num: '1,200+', label: 'Lượt pet check-in' },
+            { num: '5,000+', label: 'Nhật ký chăm sóc' },
+            { num: '⭐ 4.9', label: 'Đánh giá trung bình' },
           ].map((stat, i) => (
             <div key={i}>
               <p className="text-xl sm:text-2xl font-bold text-white">{stat.num}</p>
@@ -354,6 +358,65 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══════════════════ TESTIMONIALS ═══════════════════ */}
+      <section id="testimonials" className="py-16 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10 sm:mb-16">
+            <p className="text-teal-400 font-semibold text-sm uppercase tracking-widest mb-3">Khách hàng nói gì?</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Được tin dùng bởi các Pet Hotel</h2>
+            <p className="text-slate-400 mt-3 text-sm sm:text-base">Hàng chục pet hotel trên cả nước đã chọn PetLog để nâng cao chất lượng dịch vụ</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Nguyễn Thị Hương',
+                role: 'Chủ Pet Paradise Hotel, TP.HCM',
+                text: 'Trước đây mình phải nhắn Zalo cho từng khách cập nhật tình trạng bé. Giờ chỉ cần ghi log, khách tự xem diary. Tiết kiệm hàng tiếng đồng hồ mỗi ngày!',
+                stars: 5,
+                avatar: '🐕',
+              },
+              {
+                name: 'Trần Minh Đức',
+                role: 'Chủ Furry Friends Pet Hotel, Hà Nội',
+                text: 'Khách hàng rất thích tính năng diary real-time. Họ gửi pet yên tâm hơn vì xem được ảnh, video chăm sóc. Nhiều khách giới thiệu thêm bạn bè nhờ vậy.',
+                stars: 5,
+                avatar: '🐈',
+              },
+              {
+                name: 'Lê Thanh Mai',
+                role: 'Chủ Happy Paws, Đà Nẵng',
+                text: 'Setup chỉ mất 5 phút, in QR dán lên cửa chuồng là xong. Nhân viên mình ai cũng dùng được ngay, không cần đào tạo phức tạp. Giá cả rất hợp lý!',
+                stars: 5,
+                avatar: '🐾',
+              },
+            ].map((t, i) => (
+              <div key={i} className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 sm:p-8 hover:border-teal-500/30 transition-all relative">
+                <Quote size={32} className="absolute top-4 right-4 text-teal-500/10" />
+                {/* Stars */}
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: t.stars }).map((_, si) => (
+                    <Star key={si} size={16} className="text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                {/* Review text */}
+                <p className="text-slate-300 leading-relaxed mb-6 text-sm sm:text-base italic">&ldquo;{t.text}&rdquo;</p>
+                {/* Author */}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-lg">
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-white">{t.name}</p>
+                    <p className="text-xs text-slate-500">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════════ PRICING ═══════════════════ */}
       <section id="pricing" className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
@@ -424,6 +487,25 @@ export default function LandingPage() {
               </div>
             </div>
           )}
+
+          {/* Trust badges */}
+          <div className="mt-10 sm:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              { icon: Lock, label: 'Thanh toán bảo mật', sub: 'Qua PayOS — hỗ trợ mọi ngân hàng VN', color: 'text-green-400' },
+              { icon: Monitor, label: 'Mọi thiết bị', sub: 'Web app — không cần tải app', color: 'text-blue-400' },
+              { icon: Globe, label: 'Server Việt Nam', sub: 'Dữ liệu lưu trữ an toàn tại VN', color: 'text-amber-400' },
+              { icon: Headphones, label: 'Hỗ trợ nhanh', sub: 'Phản hồi trong vòng 24 giờ', color: 'text-purple-400' },
+            ].map((badge, i) => {
+              const Icon = badge.icon;
+              return (
+              <div key={i} className="text-center p-4 rounded-xl bg-slate-800/30 border border-slate-700/30">
+                <Icon size={24} className={`${badge.color} mx-auto mb-2`} />
+                <p className="text-sm font-semibold text-slate-200">{badge.label}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{badge.sub}</p>
+              </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
