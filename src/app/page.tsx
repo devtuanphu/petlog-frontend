@@ -614,7 +614,7 @@ export default function LandingPage() {
       <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-3">
         {/* Zalo float */}
         <a
-          href="https://zalo.me/0909123456"
+          href="https://zalo.me/0383644795"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat Zalo"
