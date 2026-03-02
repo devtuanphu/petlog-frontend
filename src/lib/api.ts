@@ -62,8 +62,24 @@ class ApiClient {
     return this.request<any>('/hotel');
   }
 
-  updateHotel(data: Partial<{ name: string; address: string; phone: string }>) {
+  updateHotel(data: Partial<{ name: string; address: string; phone: string; payment_policy: string; payment_deposit_percent: number; payment_note: string; bank_name: string; bank_bin: string; bank_account_no: string; bank_account_name: string }>) {
     return this.request<any>('/hotel', { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  updatePaymentStatus(bookingId: number, data: { payment_status: string; payment_method?: string; payment_amount?: number }) {
+    return this.request<any>(`/bookings/${bookingId}/payment`, { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  async uploadLogo(file: File) {
+    const formData = new FormData();
+    formData.append('logo', file);
+    const res = await fetch(`${API_URL}/hotel/logo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${this.token}` },
+      body: formData,
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
   }
 
   // Staff
@@ -102,6 +118,10 @@ class ApiClient {
     return this.request<any[]>(`/bookings${q}`);
   }
 
+  getBooking(id: number) {
+    return this.request<any>(`/bookings/${id}`);
+  }
+
   checkoutBooking(id: number) {
     return this.request<any>(`/bookings/${id}/checkout`, { method: 'PATCH' });
   }
@@ -131,7 +151,7 @@ class ApiClient {
     return this.request<any>(`/public/room/${qrToken}`);
   }
 
-  checkin(qrToken: string, data: { owner_name: string; owner_phone: string; expected_checkout?: string; pets: any[] }) {
+  checkin(qrToken: string, data: { owner_name: string; owner_phone: string; expected_checkout?: string; pets: any[]; selected_services?: number[] }) {
     return this.request<any>(`/public/checkin/${qrToken}`, { method: 'POST', body: JSON.stringify(data) });
   }
 
@@ -234,6 +254,117 @@ class ApiClient {
 
   getExtraRoomPrice() {
     return this.request<{ price: number }>('/payment/extra-room-price');
+  }
+
+  // Room update (type + price)
+  updateRoom(id: number, data: Partial<{ room_name: string; room_type: string; daily_rate: number; room_type_id: number }>) {
+    return this.request<any>(`/rooms/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  // Room Types
+  getRoomTypes() {
+    return this.request<any[]>('/room-types');
+  }
+
+  createRoomType(data: { name: string; daily_rate: number; price_tiers?: { label: string; price: number }[]; max_pets?: number; description?: string; color?: string; icon?: string }) {
+    return this.request<any>('/room-types', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  updateRoomType(id: number, data: Partial<{ name: string; daily_rate: number; price_tiers: { label: string; price: number }[]; max_pets: number; description: string; color: string; icon: string; is_active: boolean; sort_order: number }>) {
+    return this.request<any>(`/room-types/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  }
+
+  deleteRoomType(id: number) {
+    return this.request<any>(`/room-types/${id}`, { method: 'DELETE' });
+  }
+
+  // Promotions
+  getPromotions() {
+    return this.request<any[]>('/promotions');
+  }
+
+  createPromotion(data: { name: string; condition_type: string; condition_value: number; reward_type: string; reward_service_id?: number; reward_value: number; reward_label?: string; description?: string }) {
+    return this.request<any>('/promotions', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  updatePromotion(id: number, data: Partial<{ name: string; condition_type: string; condition_value: number; reward_type: string; reward_service_id: number; reward_value: number; reward_label: string; description: string; is_active: boolean }>) {
+    return this.request<any>(`/promotions/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  }
+
+  deletePromotion(id: number) {
+    return this.request<any>(`/promotions/${id}`, { method: 'DELETE' });
+  }
+
+  getPendingPromotions() {
+    return this.request<any[]>('/promotions/pending');
+  }
+
+  fulfillPromotion(bpId: number, note?: string) {
+    return this.request<any>(`/promotions/fulfill/${bpId}`, { method: 'PUT', body: JSON.stringify({ note }) });
+  }
+
+  // Billing - Service Templates
+  getServiceTemplates() {
+    return this.request<any[]>('/service-templates');
+  }
+
+  createServiceTemplate(data: { name: string; default_price: number; sort_order?: number }) {
+    return this.request<any>('/service-templates', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  updateServiceTemplate(id: number, data: Partial<{ name: string; default_price: number; is_active: boolean; sort_order: number }>) {
+    return this.request<any>(`/service-templates/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  deleteServiceTemplate(id: number) {
+    return this.request<any>(`/service-templates/${id}`, { method: 'DELETE' });
+  }
+
+  // Billing - Service Charges on Booking
+  getBookingServices(bookingId: number) {
+    return this.request<any[]>(`/bookings/${bookingId}/services`);
+  }
+
+  addBookingService(bookingId: number, data: { service_name: string; quantity: number; unit_price: number; note?: string }) {
+    return this.request<any>(`/bookings/${bookingId}/services`, { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  removeBookingService(bookingId: number, chargeId: number) {
+    return this.request<any>(`/bookings/${bookingId}/services/${chargeId}`, { method: 'DELETE' });
+  }
+
+  // Billing Preview & Invoice
+  getBillingPreview(bookingId: number) {
+    return this.request<any>(`/bookings/${bookingId}/billing`);
+  }
+
+  getInvoice(bookingId: number) {
+    return this.request<any>(`/bookings/${bookingId}/invoice`);
+  }
+
+  // Revenue Stats
+  getRevenueStats(from?: string, to?: string) {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const qs = params.toString();
+    return this.request<any>(`/revenue/stats${qs ? '?' + qs : ''}`);
+  }
+
+  // Updated checkout with discount + optional custom checkout time
+  checkoutWithBilling(id: number, opts?: { discount?: number; discount_type?: string; check_out_at?: string }) {
+    return this.request<any>(`/bookings/${id}/checkout`, {
+      method: 'PATCH',
+      body: JSON.stringify(opts || {}),
+    });
+  }
+
+  // Extend stay - update expected checkout date
+  extendStay(id: number, expected_checkout: string) {
+    return this.request<any>(`/bookings/${id}/extend`, {
+      method: 'PATCH',
+      body: JSON.stringify({ expected_checkout }),
+    });
   }
 }
 

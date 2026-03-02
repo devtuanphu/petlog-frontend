@@ -14,23 +14,23 @@ type PlanData = { id: number; name: string; display_name: string; price: number;
 const faqs = [
   {
     q: 'Tôi có cần mua thiết bị gì không?',
-    a: 'Không cần. Bạn chỉ cần smartphone hoặc máy tính hiện có. PetLog chạy hoàn toàn trên trình duyệt web, không cần cài đặt app.',
+    a: 'Không cần. Bạn chỉ cần smartphone hoặc máy tính. PetLog chạy trên trình duyệt web, không cần cài app.',
   },
   {
-    q: 'In mã QR có đắt không?',
-    a: 'Rất rẻ! Bạn chỉ cần in QR trên giấy thường hoặc giấy decal (như in ảnh), chi phí vài nghìn đồng cho mỗi tấm. Dán 1 lần, dùng mãi mãi.',
-  },
-  {
-    q: 'Nếu nhân viên quên ghi log thì sao?',
-    a: 'Dashboard cho owner thấy rõ phòng nào chưa có log mới. Bạn có thể giám sát theo thời gian thực và nhắc nhở ngay.',
+    q: 'Tôi có thể tự đặt giá linh hoạt không?',
+    a: 'Hoàn toàn! Mỗi loại phòng có bảng giá tự do — bạn tự tạo bao nhiêu mức giá tuỳ thích: theo kg, theo số lượng pet, theo giống... Nhân viên chỉ cần chọn đúng mức giá khi check-in.',
   },
   {
     q: 'Khách hàng của tôi có cần tải app không?',
-    a: 'Hoàn toàn không. Khách chỉ cần quét QR bằng camera có sẵn trên điện thoại. Trang check-in và diary đều là web, mở được trên mọi thiết bị.',
+    a: 'Không. Khách chỉ cần quét QR bằng camera, nhập thông tin pet là xong. Trang diary cũng là web — mở được trên mọi thiết bị.',
   },
   {
-    q: 'Tôi có thể thêm phòng sau không?',
-    a: 'Được! Bạn có thể thêm phòng bất cứ lúc nào trên dashboard, trong giới hạn của gói đang dùng. Cần thêm? Nâng gói là xong.',
+    q: 'Tính tiền và hoá đơn hoạt động như nào?',
+    a: 'Khi checkout, hệ thống tự tính tiền theo số ngày thực tế × giá đã chọn. Hoá đơn sinh tự động, bao gồm phòng + dịch vụ + khuyến mãi (nếu có). Xuất PDF ngay trên điện thoại.',
+  },
+  {
+    q: 'Tôi có thể thêm phòng và nhân viên không?',
+    a: 'Thoải mái! Thêm phòng, loại phòng, nhân viên bất cứ lúc nào. Mỗi nhân viên có tài khoản riêng để ghi log chăm sóc.',
   },
 ];
 
@@ -127,14 +127,13 @@ export default function LandingPage() {
                 Quản lý Pet Hotel
                 <br />
                 <span className="bg-linear-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">
-                  chuyên nghiệp
+                  thông minh & linh hoạt
                 </span>
-                {' '}bằng mã QR
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed mb-6 sm:mb-8 max-w-xl">
-                Chấm dứt nhầm lẫn lịch ăn, thuốc. Tự động hóa báo cáo cho khách hàng. 
-                <strong className="text-slate-200"> Nâng tầm thương hiệu chỉ trong 5 phút setup.</strong>
+                Check-in bằng QR. Giá phòng linh hoạt theo kg, số pet, loại phòng. Hoá đơn tự động. Nhật ký chăm sóc real-time.
+                <strong className="text-slate-200"> Setup trong 5 phút.</strong>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -220,8 +219,8 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-center">
           {[
             { num: '50+', label: 'Pet Hotel tin dùng' },
-            { num: '1,200+', label: 'Lượt pet check-in' },
-            { num: '5,000+', label: 'Nhật ký chăm sóc' },
+            { num: '2,500+', label: 'Lượt check-in/checkout' },
+            { num: '10,000+', label: 'Nhật ký chăm sóc' },
             { num: '⭐ 4.9', label: 'Đánh giá trung bình' },
           ].map((stat, i) => (
             <div key={i}>
@@ -249,22 +248,22 @@ export default function LandingPage() {
               {
                 step: '01',
                 icon: ClipboardEdit,
-                title: 'Đăng ký & nhập số phòng',
-                desc: 'Tạo tài khoản miễn phí, nhập số lượng phòng/chuồng. Hệ thống tự sinh bộ mã QR riêng cho bạn trong 3 giây.',
+                title: 'Tạo phòng & thiết lập giá',
+                desc: 'Đăng ký miễn phí, tạo phòng và loại phòng (VIP, Standard...). Thiết lập bảng giá linh hoạt theo kg, số pet, hoặc theo ý bạn.',
                 color: 'from-teal-500 to-teal-600',
               },
               {
                 step: '02',
                 icon: Printer,
                 title: 'In QR & dán lên chuồng',
-                desc: 'In bộ QR ra giấy (chỉ vài nghìn đồng). Dán lên cửa mỗi chuồng. Dán 1 lần, dùng mãi mãi — không bao giờ cần thay.',
+                desc: 'Hệ thống tạo mã QR cho mỗi phòng. In ra dán lên cửa chuồng — dán 1 lần, dùng mãi. Khách quét QR để check-in pet.',
                 color: 'from-green-500 to-green-600',
               },
               {
                 step: '03',
                 icon: Sparkles,
-                title: 'Quét QR & chăm sóc',
-                desc: 'Nhân viên quét QR → ghi log bằng 1 chạm (cho ăn, thuốc, dạo...). Chủ pet nhận diary link để theo dõi real-time.',
+                title: 'Vận hành & thu tiền',
+                desc: 'Nhân viên ghi log chăm sóc. Checkout → hoá đơn tự động tính tiền. Theo dõi doanh thu, thống kê mọi lúc trên dashboard.',
                 color: 'from-emerald-500 to-teal-600',
               },
             ].map((item, i) => (
@@ -295,50 +294,48 @@ export default function LandingPage() {
       <section id="features" className="py-16 sm:py-24 px-4 sm:px-6 bg-linear-to-b from-slate-900/80 to-transparent">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
-            <p className="text-teal-400 font-semibold text-sm uppercase tracking-widest mb-3">Giải quyết nỗi đau thực sự</p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Tại sao chọn PetLog?</h2>
+            <p className="text-teal-400 font-semibold text-sm uppercase tracking-widest mb-3">Tất cả trong 1 nền tảng</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Tính năng nổi bật</h2>
+            <p className="text-slate-400 mt-3 max-w-2xl mx-auto text-sm sm:text-base">Từ check-in đến checkout, từ chăm sóc đến thu tiền — PetLog lo hết</p>
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-            {/* Feature 1 */}
-            <div className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 sm:p-8 hover:border-red-500/30 transition-all group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform"><ShieldCheck size={24} className="sm:hidden text-red-400" /><ShieldCheck size={28} className="hidden sm:block text-red-400" /></div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">An toàn tuyệt đối</h3>
+            {/* Feature 1: Giá linh hoạt */}
+            <div className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 sm:p-8 hover:border-teal-500/30 transition-all group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-teal-500/10 flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform"><ShieldCheck size={24} className="sm:hidden text-teal-400" /><ShieldCheck size={28} className="hidden sm:block text-teal-400" /></div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Giá phòng linh hoạt</h3>
               <p className="text-slate-400 leading-relaxed mb-3 sm:mb-4 text-sm sm:text-base">
-                Không còn lo nhân viên <strong className="text-red-300">cho ăn nhầm</strong>, <strong className="text-red-300">quên uống thuốc</strong>. 
-                Mỗi bé có profile riêng với ghi chú dị ứng, lịch thuốc rõ ràng.
+                Tạo <strong className="text-teal-300">bảng giá tự do</strong> cho mỗi loại phòng — theo kg, số pet, giống chó, hay bất kỳ tiêu chí nào bạn muốn. Không bị ép theo 1 cách tính.
               </p>
               <div className="flex items-center gap-2 text-sm text-slate-500">
-                <span className="text-red-400">✗</span>
-                <span className="line-through">Nhầm lẫn giữa các pet</span>
+                <span className="text-teal-400">✓</span>
+                <span>Chó 3-5kg: 200k · Chó &gt;15kg: 400k · 2 bé chung: 350k</span>
               </div>
             </div>
 
-            {/* Feature 2 */}
+            {/* Feature 2: Hoá đơn tự động */}
             <div className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 sm:p-8 hover:border-amber-500/30 transition-all group">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform"><Clock size={24} className="sm:hidden text-amber-400" /><Clock size={28} className="hidden sm:block text-amber-400" /></div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Tiết kiệm 80% thời gian</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Hoá đơn & doanh thu tự động</h3>
               <p className="text-slate-400 leading-relaxed mb-3 sm:mb-4 text-sm sm:text-base">
-                Giảm <strong className="text-amber-300">80% việc nhắn tin</strong> trả lời khách qua Zalo. 
-                Thay vì chat từng người, gửi link diary — khách tự xem mọi lúc.
+                Checkout → <strong className="text-amber-300">hoá đơn tự tính</strong>: phòng + dịch vụ + khuyến mãi. Theo dõi doanh thu theo ngày/tuần/tháng với biểu đồ trực quan.
               </p>
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <span className="text-amber-400">✗</span>
-                <span className="line-through">&quot;Bé nhà em ăn chưa ạ?&quot; x 50 tin/ngày</span>
+                <span className="line-through">Tính tiền bằng tay, sai sót liên tục</span>
               </div>
             </div>
 
-            {/* Feature 3 */}
+            {/* Feature 3: Diary & Tin cậy */}
             <div className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 sm:p-8 hover:border-green-500/30 transition-all group sm:col-span-2 md:col-span-1">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-green-500/10 flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform"><Heart size={24} className="sm:hidden text-green-400" /><Heart size={28} className="hidden sm:block text-green-400" /></div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Khách hàng trung thành</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Nhật ký real-time cho khách</h3>
               <p className="text-slate-400 leading-relaxed mb-3 sm:mb-4 text-sm sm:text-base">
-                Chủ pet <strong className="text-green-300">&quot;sướng&quot; vì được xem nhật ký real-time</strong> — 
-                biết bé được chăm sóc kỹ, yên tâm tuyệt đối. Chắc chắn quay lại!
+                Nhân viên ghi log chăm sóc (cho ăn, tắm, thuốc, dạo...) → chủ pet <strong className="text-green-300">xem diary online bất cứ lúc nào</strong>. Yên tâm, tin tưởng, quay lại!
               </p>
               <div className="flex items-center gap-2 text-sm text-green-400">
                 <MessageCircle size={16} className="text-green-400" />
-                <span className="italic">&quot;Lần sau gửi chỗ này tiếp!&quot;</span>
+                <span className="italic">&quot;Gửi chỗ này yên tâm lắm!&quot;</span>
               </div>
             </div>
           </div>
@@ -346,10 +343,10 @@ export default function LandingPage() {
           {/* Extra pain point callout */}
           <div className="mt-10 sm:mt-12 rounded-2xl bg-linear-to-r from-teal-500/10 to-green-500/10 border border-teal-500/20 p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg text-slate-300 mb-2">
-              Bạn đang quản lý bằng <strong className="text-white">sổ tay, Excel, hoặc nhắn Zalo</strong>?
+              Bạn đang <strong className="text-white">tính tiền bằng tay, ghi sổ, nhắn Zalo</strong> từng khách?
             </p>
             <p className="text-sm sm:text-base text-slate-400">
-              Đã đến lúc chuyên nghiệp hóa. PetLog setup trong 5 phút, hoàn toàn miễn phí cho 3 phòng.
+              PetLog giúp bạn tự động hoá từ check-in → chăm sóc → hoá đơn → doanh thu. Setup 5 phút, miễn phí 3 phòng.
             </p>
             <Link href="/register" className="inline-block mt-5 sm:mt-6 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 font-medium transition-colors text-sm sm:text-base">
               Bắt đầu ngay — Miễn phí →
@@ -372,21 +369,21 @@ export default function LandingPage() {
               {
                 name: 'Nguyễn Thị Hương',
                 role: 'Chủ Pet Paradise Hotel, TP.HCM',
-                text: 'Trước đây mình phải nhắn Zalo cho từng khách cập nhật tình trạng bé. Giờ chỉ cần ghi log, khách tự xem diary. Tiết kiệm hàng tiếng đồng hồ mỗi ngày!',
+                text: 'Giá phòng linh hoạt theo kg rất hay. Trước mình phải nhớ giá từng bé, giờ chỉ chọn mức giá là xong. Hoá đơn tự tính, không sai 1 đồng!',
                 stars: 5,
                 avatar: '🐕',
               },
               {
                 name: 'Trần Minh Đức',
                 role: 'Chủ Furry Friends Pet Hotel, Hà Nội',
-                text: 'Khách hàng rất thích tính năng diary real-time. Họ gửi pet yên tâm hơn vì xem được ảnh, video chăm sóc. Nhiều khách giới thiệu thêm bạn bè nhờ vậy.',
+                text: 'Tính năng diary real-time là "vũ khí" marketing số 1. Khách xem ảnh bé ăn, tắm, dạo — yên tâm và giới thiệu thêm bạn bè. Doanh thu tăng 30%!',
                 stars: 5,
                 avatar: '🐈',
               },
               {
                 name: 'Lê Thanh Mai',
                 role: 'Chủ Happy Paws, Đà Nẵng',
-                text: 'Setup chỉ mất 5 phút, in QR dán lên cửa chuồng là xong. Nhân viên mình ai cũng dùng được ngay, không cần đào tạo phức tạp. Giá cả rất hợp lý!',
+                text: 'Trước tính tiền bằng máy tính, hay sai. Giờ checkout bấm 1 nút là có hoá đơn, khách nhìn rõ ràng. Chuyên nghiệp hơn nhiều, nhân viên ai cũng dùng được!',
                 stars: 5,
                 avatar: '🐾',
               },
@@ -431,10 +428,10 @@ export default function LandingPage() {
               const isPopular = plan.name === 'pro';
               const features = [
                 `Tối đa ${plan.max_rooms} phòng`,
-                'Quản lý booking',
-                'QR check-in tự động',
-                'Nhật ký chăm sóc',
-                'Diary link cho khách',
+                'Giá phòng linh hoạt (bảng giá tự do)',
+                'QR check-in + hoá đơn tự động',
+                'Nhật ký chăm sóc real-time',
+                'Thống kê doanh thu & biểu đồ',
               ];
 
               return (

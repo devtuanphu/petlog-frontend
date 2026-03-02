@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, PawPrint, AlertTriangle, Send, Camera, X, CalendarClock, Share2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, PawPrint, AlertTriangle, Send, Camera, X, CalendarClock, Share2, ExternalLink, Plus, Trash2, DollarSign, Receipt } from 'lucide-react';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -51,6 +51,10 @@ function timeAgo(date: string) {
   return `${Math.floor(hours / 24)}d trước`;
 }
 
+function formatVND(n: number) {
+  return n.toLocaleString('vi-VN') + 'đ';
+}
+
 function parseLogMedia(imageUrl?: string, desc?: string): { text: string; mediaUrls: string[] } {
   const mediaUrls: string[] = [];
   if (imageUrl) {
@@ -69,6 +73,9 @@ function parseLogMedia(imageUrl?: string, desc?: string): { text: string; mediaU
   return { text: textLines.join('\n'), mediaUrls };
 }
 
+type ServiceTemplate = { id: number; name: string; default_price: number };
+type ServiceCharge = { id: number; service_name: string; quantity: number; unit_price: number; total: number; note?: string; created_at: string };
+
 export default function StaffDiaryPage() {
   const router = useRouter();
   const { diaryToken } = useParams<{ diaryToken: string }>();
@@ -85,11 +92,28 @@ export default function StaffDiaryPage() {
   const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // ─── Service charges state ───
+  const [templates, setTemplates] = useState<ServiceTemplate[]>([]);
+  const [charges, setCharges] = useState<ServiceCharge[]>([]);
+  const [showServiceForm, setShowServiceForm] = useState(false);
+  const [svcName, setSvcName] = useState('');
+  const [svcQty, setSvcQty] = useState('1');
+  const [svcPrice, setSvcPrice] = useState('');
+  const [svcNote, setSvcNote] = useState('');
+  const [addingSvc, setAddingSvc] = useState(false);
+
   const loadDiary = useCallback(() => {
     api.getDiary(diaryToken).then(setDiary).catch(() => setError('Không tìm thấy')).finally(() => setLoading(false));
   }, [diaryToken]);
 
   useEffect(() => { loadDiary(); }, [loadDiary]);
+
+  // Load templates + charges when diary loaded
+  useEffect(() => {
+    if (!diary) return;
+    api.getServiceTemplates().then(setTemplates).catch(() => {});
+    api.getBookingServices(diary.booking_id).then(setCharges).catch(() => {});
+  }, [diary?.booking_id]);
 
   const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -129,6 +153,42 @@ export default function StaffDiaryPage() {
     }
   };
 
+  // ─── Service charge handlers ───
+  const pickTemplate = (t: ServiceTemplate) => {
+    setSvcName(t.name);
+    setSvcPrice(String(t.default_price));
+    setShowServiceForm(true);
+  };
+
+  const addService = async () => {
+    if (!diary || !svcName.trim() || !svcPrice) return;
+    setAddingSvc(true);
+    try {
+      const charge = await api.addBookingService(diary.booking_id, {
+        service_name: svcName.trim(),
+        quantity: parseInt(svcQty) || 1,
+        unit_price: parseInt(svcPrice) || 0,
+        note: svcNote || undefined,
+      });
+      setCharges(prev => [charge, ...prev]);
+      setSvcName(''); setSvcQty('1'); setSvcPrice(''); setSvcNote('');
+      setShowServiceForm(false);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Lỗi');
+    }
+    setAddingSvc(false);
+  };
+
+  const removeService = async (chargeId: number) => {
+    if (!diary || !confirm('Xóa dịch vụ này?')) return;
+    try {
+      await api.removeBookingService(diary.booking_id, chargeId);
+      setCharges(prev => prev.filter(c => c.id !== chargeId));
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Lỗi');
+    }
+  };
+
   const shareDiaryLink = () => {
     const url = `${window.location.origin}/diary/${diaryToken}`;
     if (navigator.share) {
@@ -140,6 +200,8 @@ export default function StaffDiaryPage() {
 
   if (loading) return <div className="animate-pulse text-teal-400">Đang tải...</div>;
   if (error || !diary) return <div className="text-red-400">{error || 'Không tìm thấy'}</div>;
+
+  const totalCharges = charges.reduce((s, c) => s + c.total, 0);
 
   return (
     <div className="max-w-2xl">
@@ -173,7 +235,7 @@ export default function StaffDiaryPage() {
         </div>
       )}
 
-      {/* Expected checkout / overdue */}
+      {/* Expected checkout */}
       {diary.expected_checkout && diary.status === 'active' && (() => {
         const isOverdue = new Date(diary.expected_checkout) < new Date();
         return (
@@ -205,6 +267,83 @@ export default function StaffDiaryPage() {
           <ExternalLink size={12} /> Xem diary công khai
         </a>
       </div>
+
+      {/* ===== SERVICE CHARGES SECTION ===== */}
+      {diary.status === 'active' && (
+        <div className="rounded-2xl bg-slate-800/50 border border-slate-700 p-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-sm flex items-center gap-2"><DollarSign size={14} className="text-amber-400" /> Dịch vụ phát sinh</h3>
+            {totalCharges > 0 && (
+              <span className="text-xs text-teal-400 font-medium">Tổng: {formatVND(totalCharges)}</span>
+            )}
+          </div>
+
+          {/* Existing charges */}
+          {charges.length > 0 && (
+            <div className="space-y-1.5 mb-3">
+              {charges.map(c => (
+                <div key={c.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 text-sm">
+                  <div className="min-w-0">
+                    <span className="text-slate-200">{c.service_name}</span>
+                    <span className="text-slate-500 ml-1">×{c.quantity}</span>
+                    {c.note && <span className="text-slate-600 text-xs ml-2">({c.note})</span>}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-teal-400 text-xs font-medium">{formatVND(c.total)}</span>
+                    <button onClick={() => removeService(c.id)} className="p-1 text-red-400/70 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors">
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Quick pick from templates */}
+          {!showServiceForm && (
+            <div>
+              {templates.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {templates.map(t => (
+                    <button key={t.id} onClick={() => pickTemplate(t)}
+                      className="px-3 py-1.5 rounded-full text-xs bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20 transition-colors">
+                      {t.name} • {formatVND(t.default_price)}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <button onClick={() => setShowServiceForm(true)}
+                className="w-full py-2 rounded-lg border border-dashed border-slate-600 text-xs text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors flex items-center justify-center gap-1">
+                <Plus size={12} /> Thêm DV khác
+              </button>
+            </div>
+          )}
+
+          {/* Service form */}
+          {showServiceForm && (
+            <div className="space-y-2 p-3 rounded-xl bg-slate-900 border border-slate-700">
+              <input type="text" value={svcName} onChange={e => setSvcName(e.target.value)}
+                placeholder="Tên dịch vụ" className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm focus:outline-none focus:border-teal-500" />
+              <div className="flex gap-2">
+                <input type="number" value={svcQty} onChange={e => setSvcQty(e.target.value)}
+                  placeholder="SL" className="w-16 px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm focus:outline-none focus:border-teal-500 text-center" />
+                <input type="number" value={svcPrice} onChange={e => setSvcPrice(e.target.value)}
+                  placeholder="Đơn giá (VND)" className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm focus:outline-none focus:border-teal-500" />
+              </div>
+              <input type="text" value={svcNote} onChange={e => setSvcNote(e.target.value)}
+                placeholder="Ghi chú (tuỳ chọn)" className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm focus:outline-none focus:border-teal-500" />
+              <div className="flex gap-2">
+                <button onClick={() => { setShowServiceForm(false); setSvcName(''); setSvcPrice(''); setSvcNote(''); }}
+                  className="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm transition-colors">Hủy</button>
+                <button onClick={addService} disabled={addingSvc || !svcName.trim() || !svcPrice}
+                  className="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-sm font-medium transition-colors flex items-center justify-center gap-1">
+                  {addingSvc ? '...' : <><Receipt size={12} /> Thêm DV</>}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ===== ADD ENTRY FORM ===== */}
       {diary.status === 'active' && (

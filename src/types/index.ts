@@ -12,6 +12,13 @@ export interface Hotel {
   address?: string;
   phone?: string;
   logo_url?: string;
+  payment_policy?: string;
+  payment_deposit_percent?: number;
+  payment_note?: string;
+  bank_name?: string;
+  bank_bin?: string;
+  bank_account_no?: string;
+  bank_account_name?: string;
 }
 
 export interface Room {
@@ -21,6 +28,14 @@ export interface Room {
   qr_token: string;
   qr_image_url?: string;
   is_active: boolean;
+  room_type_id?: number;
+  roomType?: {
+    id: number;
+    name: string;
+    daily_rate: number;
+    color: string;
+    icon: string;
+  };
   status?: 'free' | 'occupied';
   active_booking?: {
     id: number;
@@ -52,6 +67,21 @@ export interface Booking {
   status: 'active' | 'completed';
   room?: Room;
   pets?: Pet[];
+  // Billing
+  daily_rate?: number;
+  room_total?: number;
+  services_total?: number;
+  discount?: number;
+  discount_type?: string;
+  grand_total?: number;
+  invoice_number?: string;
+  room_type_name?: string;
+  services?: { id: number; name: string; total: number }[];
+  // Payment tracking
+  payment_status?: string;
+  payment_method?: string;
+  payment_amount?: number;
+  paid_at?: string;
 }
 
 export interface LogEntry {
@@ -74,6 +104,14 @@ export interface DiaryData {
   check_out_at?: string;
   expected_checkout?: string;
   status: string;
+  payment_status?: string;
+  grand_total: number;
+  bank?: {
+    bin: string;
+    name: string;
+    account_no: string;
+    account_name: string;
+  } | null;
   pets: Pet[];
   logs: LogEntry[];
 }

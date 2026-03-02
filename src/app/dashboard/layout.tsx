@@ -4,18 +4,20 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutDashboard, DoorOpen, ClipboardList, Users, QrCode, Settings, LogOut, MessageSquare, Crown, BookOpen, Menu, X, ScanLine, FileText } from 'lucide-react';
+import { LayoutDashboard, DoorOpen, ClipboardList, Users, QrCode, Settings, LogOut, MessageSquare, Crown, BookOpen, Menu, X, ScanLine, FileText, Sparkles, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: ('owner' | 'staff')[] };
 
 const navItems: NavItem[] = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Tổng quan', roles: ['owner', 'staff'] },
+  { href: '/dashboard/revenue', icon: TrendingUp, label: 'Doanh thu', roles: ['owner'] },
   { href: '/dashboard/rooms', icon: DoorOpen, label: 'Phòng', roles: ['owner'] },
   { href: '/dashboard/bookings', icon: ClipboardList, label: 'Lượt gửi', roles: ['owner', 'staff'] },
   { href: '/dashboard/diary', icon: BookOpen, label: 'Nhật ký', roles: ['owner', 'staff'] },
   { href: '/dashboard/staff', icon: Users, label: 'Nhân viên', roles: ['owner'] },
   { href: '/dashboard/qr-print', icon: QrCode, label: 'In QR', roles: ['owner'] },
+  { href: '/dashboard/services', icon: Sparkles, label: 'Dịch vụ & Giá', roles: ['owner'] },
   { href: '/dashboard/feedback', icon: MessageSquare, label: 'Góp ý', roles: ['owner', 'staff'] },
   { href: '/dashboard/pricing', icon: Crown, label: 'Nâng cấp', roles: ['owner'] },
   { href: '/dashboard/guide', icon: FileText, label: 'Hướng dẫn', roles: ['owner', 'staff'] },

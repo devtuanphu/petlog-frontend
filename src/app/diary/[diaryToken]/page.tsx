@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { PawPrint, Share2, ClipboardList, LogIn, CalendarClock, LogOut, AlertTriangle, Clock } from 'lucide-react';
 import Image from 'next/image';
@@ -9,6 +9,7 @@ import { copyToClipboard } from '@/lib/clipboard';
 import { DiaryData } from '@/types';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/api$/, '');
+const POLL_INTERVAL = 15_000; // 15 seconds
 
 const actionLabels: Record<string, string> = {
   feed: '🍖 Cho ăn', walk: '🚶 Đi dạo', bath: '🛁 Tắm rửa',
@@ -68,10 +69,42 @@ export default function DiaryPage() {
   const [diary, setDiary] = useState<DiaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasNewLogs, setHasNewLogs] = useState(false);
+  const prevLogCount = useRef(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    api.getDiary(diaryToken).then(setDiary).catch(() => setError('Diary không tìm thấy')).finally(() => setLoading(false));
+  const fetchDiary = useCallback(() => {
+    return api.getDiary(diaryToken).then((data) => {
+      // Detect new logs
+      if (prevLogCount.current > 0 && data.logs.length > prevLogCount.current) {
+        setHasNewLogs(true);
+        setTimeout(() => setHasNewLogs(false), 3000);
+      }
+      prevLogCount.current = data.logs.length;
+      setDiary(data);
+      return data;
+    });
   }, [diaryToken]);
+
+  // Initial load
+  useEffect(() => {
+    fetchDiary()
+      .catch(() => setError('Diary không tìm thấy'))
+      .finally(() => setLoading(false));
+  }, [fetchDiary]);
+
+  // Auto-polling every 15s (only for active bookings)
+  useEffect(() => {
+    if (!diary || diary.status !== 'active') return;
+
+    intervalRef.current = setInterval(() => {
+      fetchDiary().catch(() => {});
+    }, POLL_INTERVAL);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [diary?.status, fetchDiary]);
 
   const share = () => {
     const url = window.location.href;
@@ -127,12 +160,15 @@ export default function DiaryPage() {
 
           {/* Overdue alert */}
           {diary.status === 'active' && diary.expected_checkout && new Date(diary.expected_checkout) < new Date() && (() => {
-            const overdueDays = Math.ceil((new Date().getTime() - new Date(diary.expected_checkout).getTime()) / (1000 * 60 * 60 * 24));
+            const diffMs = new Date().getTime() - new Date(diary.expected_checkout).getTime();
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+            const overdueText = diffDays > 0 ? `${diffDays} ngày ${diffHours % 24} giờ` : `${diffHours} giờ`;
             return (
               <div className="mt-4 p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-left">
                 <p className="text-red-400 font-semibold text-sm flex items-center gap-1"><AlertTriangle size={14} /> Đã quá hạn đón!</p>
                 <p className="text-red-300/70 text-xs mt-0.5">
-                  Dự kiến đón lúc {new Date(diary.expected_checkout).toLocaleString('vi-VN')} — đã trễ {overdueDays} ngày. Vui lòng liên hệ hotel.
+                  Dự kiến đón lúc {new Date(diary.expected_checkout).toLocaleString('vi-VN')} — đã trễ {overdueText}. Vui lòng liên hệ hotel.
                 </p>
               </div>
             );
@@ -152,12 +188,77 @@ export default function DiaryPage() {
           <button onClick={share} className="mt-4 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-sm transition-colors flex items-center gap-1.5 mx-auto">
             <Share2 size={14} /> Chia sẻ diary
           </button>
+
+          {/* ═══ PAYMENT SECTION ═══ */}
+          {diary.status === 'completed' && diary.grand_total > 0 && diary.bank && diary.payment_status !== 'paid' && (() => {
+            const qrUrl = `https://img.vietqr.io/image/${diary.bank.bin}-${diary.bank.account_no}-compact2.png?amount=${diary.grand_total}&addInfo=${encodeURIComponent(`PetLog ${diary.booking_id}`)}&accountName=${encodeURIComponent(diary.bank.account_name || '')}`;
+            const POPULAR_BANKS = [
+              { appId: 'vcb', name: 'VCB', logo: '🏦' },
+              { appId: 'bidv', name: 'BIDV', logo: '🏦' },
+              { appId: 'icb', name: 'VietinBank', logo: '🏦' },
+              { appId: 'mb', name: 'MB Bank', logo: '🏦' },
+              { appId: 'tcb', name: 'Techcom', logo: '🏦' },
+              { appId: 'vba', name: 'Agribank', logo: '🏦' },
+              { appId: 'tpb', name: 'TPBank', logo: '🏦' },
+              { appId: 'vpb', name: 'VPBank', logo: '🏦' },
+              { appId: 'acb', name: 'ACB', logo: '🏦' },
+            ];
+
+            return (
+              <div className="mt-6 p-4 rounded-2xl bg-gradient-to-b from-emerald-900/30 to-slate-800/50 border border-emerald-500/20">
+                <h3 className="font-semibold text-center mb-1 text-emerald-300 text-sm">💳 Thanh toán</h3>
+                <p className="text-2xl font-bold text-center text-white mb-1">{diary.grand_total.toLocaleString('vi-VN')}đ</p>
+                <p className="text-[10px] text-slate-500 text-center mb-4">{diary.bank.name} · {diary.bank.account_no} · {diary.bank.account_name}</p>
+
+                {/* QR */}
+                <div className="flex justify-center mb-4">
+                  <img src={qrUrl} alt="VietQR" className="w-52 h-auto rounded-xl bg-white p-1.5 shadow-lg" />
+                </div>
+                <p className="text-[10px] text-emerald-400/60 text-center mb-4">Quét mã QR hoặc bấm vào app ngân hàng bên dưới</p>
+
+                {/* Deeplink buttons */}
+                <div className="grid grid-cols-3 gap-2">
+                  {POPULAR_BANKS.map(b => (
+                    <a key={b.appId}
+                      href={`https://dl.vietqr.io/pay?app=${b.appId}&ba=${diary.bank!.account_no}@${b.appId}&am=${diary.grand_total}&tn=${encodeURIComponent(`PetLog ${diary.booking_id}`)}&bn=${encodeURIComponent(diary.bank!.account_name || '')}`}
+                      className="flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-xs font-medium transition-colors border border-slate-600/50 active:scale-95">
+                      {b.logo} {b.name}
+                    </a>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-600 text-center mt-3">Bấm vào tên ngân hàng để mở app thanh toán trên điện thoại</p>
+              </div>
+            );
+          })()}
+
+          {/* Paid badge */}
+          {diary.status === 'completed' && diary.payment_status === 'paid' && (
+            <div className="mt-4 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
+              <p className="text-green-400 font-semibold text-sm">✅ Đã thanh toán</p>
+              {diary.grand_total > 0 && <p className="text-xs text-slate-400 mt-0.5">{diary.grand_total.toLocaleString('vi-VN')}đ</p>}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Timeline */}
       <div className="max-w-lg mx-auto px-4">
-        <h2 className="font-semibold text-lg mb-6">Nhật ký chăm sóc</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-semibold text-lg">Nhật ký chăm sóc</h2>
+          {diary.status === 'active' && (
+            <span className="text-xs text-teal-400 flex items-center gap-1.5 bg-teal-500/10 px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+              Tự cập nhật
+            </span>
+          )}
+        </div>
+
+        {/* New log notification */}
+        {hasNewLogs && (
+          <div className="mb-4 p-3 rounded-xl bg-teal-500/15 border border-teal-500/30 text-center text-sm text-teal-300 animate-pulse">
+            ✨ Nhật ký mới vừa được cập nhật!
+          </div>
+        )}
 
         {diary.logs.length === 0 ? (
           <div className="text-center py-12 text-slate-500">

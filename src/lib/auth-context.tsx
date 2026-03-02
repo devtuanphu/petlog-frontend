@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (data: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string }) => Promise<void>;
   logout: () => void;
+  refreshHotel: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,8 +72,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSubscription(null);
   };
 
+  const refreshHotel = async () => {
+    try {
+      const data = await api.getMe();
+      setHotel(data.hotel);
+    } catch { /* ignore */ }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, hotel, subscription, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, hotel, subscription, loading, login, register, logout, refreshHotel }}>
       {children}
     </AuthContext.Provider>
   );

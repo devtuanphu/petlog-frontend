@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { PartyPopper, PawPrint, Copy, ExternalLink, CheckCircle, AlertTriangle, Plus, X, Camera, Loader2, CalendarClock } from 'lucide-react';
+import { PartyPopper, PawPrint, Copy, ExternalLink, CheckCircle, AlertTriangle, Plus, X, Camera, Loader2, CalendarClock, Sparkles, Gift, DollarSign } from 'lucide-react';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -28,6 +28,7 @@ export default function CheckinPage() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<any>(null);
   const [uploadingPet, setUploadingPet] = useState<number | null>(null);
+  const [selectedServices, setSelectedServices] = useState<number[]>([]);
 
   useEffect(() => {
     api.getRoomInfo(qrToken).then((info) => {
@@ -92,6 +93,7 @@ export default function CheckinPage() {
         owner_phone: ownerPhone,
         expected_checkout: expectedCheckout || undefined,
         pets,
+        selected_services: selectedServices.length > 0 ? selectedServices : undefined,
       });
       setResult(res);
     } catch (err: any) {
@@ -142,6 +144,13 @@ export default function CheckinPage() {
             <PawPrint size={36} className="text-teal-400 mx-auto" />
             <h1 className="text-xl font-bold mt-2">{roomInfo.hotel.name}</h1>
             <p className="text-slate-400">{roomInfo.room.room_name}</p>
+            {roomInfo.room.room_type && (
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full mt-1 font-medium"
+                style={{ backgroundColor: roomInfo.room.room_type.color + '20', color: roomInfo.room.room_type.color }}>
+                {roomInfo.room.room_type.icon} {roomInfo.room.room_type.name}
+                {roomInfo.room.daily_rate > 0 && ` — ${new Intl.NumberFormat('vi-VN').format(roomInfo.room.daily_rate)}đ/ngày`}
+              </span>
+            )}
             {!roomInfo.is_available && (
               <div className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
                 <span className="flex items-center justify-center gap-1"><AlertTriangle size={16} /> Phòng này đang có pet, không thể check-in</span>
@@ -191,6 +200,7 @@ export default function CheckinPage() {
                   <input type="text" value={pet.name} onChange={(e) => updatePet(i, 'name', e.target.value)} required
                     className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="Mochi" />
                 </div>
+
                 <div>
                   <label className="block text-sm text-slate-300 mb-1">Loại</label>
                   <select value={pet.type} onChange={(e) => updatePet(i, 'type', e.target.value)}
@@ -235,6 +245,61 @@ export default function CheckinPage() {
               className="w-full py-3 rounded-lg border-2 border-dashed border-slate-600 text-slate-400 hover:border-teal-500 hover:text-teal-400 transition-colors flex items-center justify-center gap-1">
               <Plus size={16} /> Thêm pet
             </button>
+
+
+
+            {/* Services selection */}
+            {roomInfo.services?.length > 0 && (
+              <div className="rounded-xl bg-slate-800/50 border border-slate-700 p-5 space-y-3">
+                <h2 className="font-semibold flex items-center gap-2"><Sparkles size={16} className="text-amber-400" /> Chọn dịch vụ</h2>
+                <p className="text-xs text-slate-500">Chọn các dịch vụ bạn muốn sử dụng cho bé</p>
+                <div className="space-y-2">
+                  {roomInfo.services.map((svc: any) => (
+                    <label key={svc.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                      selectedServices.includes(svc.id) ? 'bg-teal-600/15 border border-teal-500/30' : 'bg-slate-900/40 border border-slate-700/50 hover:border-slate-600'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <input type="checkbox" checked={selectedServices.includes(svc.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedServices([...selectedServices, svc.id]);
+                            else setSelectedServices(selectedServices.filter(id => id !== svc.id));
+                          }}
+                          className="accent-teal-500 w-4 h-4" />
+                        <span className="text-sm font-medium">{svc.name}</span>
+                      </div>
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <DollarSign size={10} />
+                        {new Intl.NumberFormat('vi-VN').format(svc.default_price)}đ
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Promotions info */}
+            {roomInfo.promotions?.length > 0 && (
+              <div className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-5 space-y-3">
+                <h2 className="font-semibold flex items-center gap-2 text-amber-400"><Gift size={16} /> Khuyến mãi đang áp dụng</h2>
+                <div className="space-y-2">
+                  {roomInfo.promotions.map((p: any) => (
+                    <div key={p.id} className="flex items-start gap-2 text-sm">
+                      <Gift size={12} className="text-amber-400/60 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-slate-200">{p.name}</p>
+                        <p className="text-[11px] text-slate-500">
+                          {p.condition_type === 'min_days' && `Gửi ≥ ${p.condition_value} ngày`}
+                          {p.condition_type === 'min_amount' && `Chi ≥ ${new Intl.NumberFormat('vi-VN').format(p.condition_value)}đ`}
+                          {p.condition_type === 'min_pets' && `≥ ${p.condition_value} pet`}
+                          {' → '}
+                          {p.reward_label || p.name}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <button type="submit" disabled={submitting}
               className="w-full py-4 rounded-xl bg-linear-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 disabled:opacity-50 font-semibold text-lg transition-all shadow-lg shadow-teal-500/25">
