@@ -72,7 +72,7 @@ const RechartsBar = dynamic(() => import('recharts').then(m => {
           <Tooltip cursor={{ fill: 'rgba(148,163,184,0.06)' }}
             contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(148,163,184,0.15)', borderRadius: '14px', padding: '12px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
             labelStyle={{ color: '#94a3b8', fontSize: 11, marginBottom: 6, fontWeight: 500 }}
-            formatter={(value: any, name: string) => [formatVND(Number(value)), name === 'room' ? 'Phòng' : 'Dịch vụ']}
+            formatter={(value: any, name?: string) => [formatVND(Number(value)), name === 'room' ? 'Phòng' : 'Dịch vụ']}
             itemStyle={{ fontWeight: 600, fontSize: 13 }} />
           <Bar dataKey="room" fill="url(#barGradRoom)" radius={[6, 6, 0, 0]} name="room" stackId="a" />
           <Bar dataKey="services" fill="url(#barGradSvc)" radius={[6, 6, 0, 0]} name="services" stackId="a" />
