@@ -557,19 +557,96 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════ FOOTER ═══════════════════ */}
-      <footer className="border-t border-slate-800 py-8 sm:py-10 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Image src="/logo.png" alt="PetLog" width={100} height={32} className="h-6 sm:h-7 w-auto" />
-            <span className="text-sm text-slate-600 hidden sm:inline">|</span>
-            <span className="text-xs sm:text-sm text-slate-500 italic">Chăm sóc tận tâm — Công nghệ xứng tầm</span>
+      <footer className="border-t border-slate-800 py-10 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Top row: logo + contact */}
+          <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-8">
+            {/* Brand */}
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <Image src="/logo.png" alt="PetLog" width={100} height={32} className="h-7 w-auto" />
+              <p className="text-xs text-slate-500 italic">Chăm sóc tận tâm — Công nghệ xứng tầm</p>
+            </div>
+
+            {/* Contact block */}
+            <div className="flex flex-col items-center md:items-end gap-3">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Liên hệ & hỗ trợ</p>
+              <div className="flex flex-wrap justify-center md:justify-end gap-3">
+                {/* Zalo */}
+                <a
+                  href="https://zalo.me/0909123456"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 hover:border-blue-400/40 transition-all text-sm font-medium"
+                >
+                  <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" rx="10" fill="#0068FF"/>
+                    <path d="M24 8C15.163 8 8 14.72 8 23c0 4.695 2.276 8.893 5.85 11.74L12 40l5.63-2.47C19.6 38.47 21.75 39 24 39c8.837 0 16-6.72 16-16S32.837 8 24 8z" fill="white"/>
+                    <path d="M19 21h10M19 25h6" stroke="#0068FF" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  Zalo: 0909 123 456
+                </a>
+
+                {/* Facebook Fanpage */}
+                <a
+                  href="https://www.facebook.com/profile.php?id=61559146682432"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400/40 transition-all text-sm font-medium"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  Fanpage Facebook
+                </a>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <a href="/PetLog - Huong Dan Su Dung.html" target="_blank" className="text-xs sm:text-sm text-slate-400 hover:text-teal-400 transition-colors">📄 Hướng dẫn</a>
-            <p className="text-xs sm:text-sm text-slate-600">© 2026 PetLog. All rights reserved.</p>
+
+          {/* Bottom row */}
+          <div className="border-t border-slate-800/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <a href="/PetLog - Huong Dan Su Dung.html" target="_blank" className="text-xs text-slate-400 hover:text-teal-400 transition-colors">📄 Hướng dẫn sử dụng</a>
+            <p className="text-xs text-slate-600">© 2026 PetLog. All rights reserved.</p>
           </div>
         </div>
       </footer>
+
+      {/* ── Floating contact buttons ── */}
+      <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-3">
+        {/* Zalo float */}
+        <a
+          href="https://zalo.me/0909123456"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat Zalo"
+          className="group w-13 h-13 flex items-center justify-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/40 hover:scale-110 transition-all duration-200 relative"
+          style={{ width: 52, height: 52 }}
+        >
+          <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4C13.507 4 5 12.059 5 22c0 5.481 2.57 10.386 6.625 13.7L10 42l6.5-2.9C18.8 40.03 21.35 40.5 24 40.5 34.493 40.5 43 32.44 43 22S34.493 4 24 4z" fill="white"/>
+            <path d="M17 20.5h14M17 25.5h8" stroke="#0068FF" strokeWidth="2.5" strokeLinecap="round"/>
+          </svg>
+          <span className="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-slate-700 pointer-events-none">
+            Chat Zalo ngay
+          </span>
+        </a>
+
+        {/* Facebook float */}
+        <a
+          href="https://www.facebook.com/profile.php?id=61559146682432"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Facebook Fanpage"
+          className="group w-13 h-13 flex items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-500/40 hover:scale-110 transition-all duration-200 relative"
+          style={{ width: 52, height: 52 }}
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span className="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-slate-700 pointer-events-none">
+            Fanpage Facebook
+          </span>
+        </a>
+      </div>
     </div>
   );
 }
