@@ -609,19 +609,22 @@ export default function LandingPage() {
       {/* ── Floating contact buttons ── */}
       {/* ── Floating contact buttons ── */}
       <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-3 items-end">
-        {/* Zalo float — prominent with text */}
+        {/* Zalo float */}
         <a
           href="https://zalo.me/0383644795"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/40 hover:shadow-blue-500/60 hover:scale-105 transition-all duration-200 text-white font-semibold text-sm"
+          aria-label="Chat Zalo"
+          className="group flex items-center justify-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/40 hover:scale-110 transition-all duration-200 relative"
+          style={{ width: 52, height: 52 }}
         >
-          <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+          <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
             <path d="M24 4C13.507 4 5 12.059 5 22c0 5.481 2.57 10.386 6.625 13.7L10 42l6.5-2.9C18.8 40.03 21.35 40.5 24 40.5 34.493 40.5 43 32.44 43 22S34.493 4 24 4z" fill="white"/>
             <path d="M17 20.5h14M17 25.5h8" stroke="#0068FF" strokeWidth="2.5" strokeLinecap="round"/>
           </svg>
-          <span className="hidden sm:inline">Chat Zalo nhận tài khoản</span>
-          <span className="sm:hidden">Zalo</span>
+          <span className="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-slate-700 pointer-events-none">
+            Chat Zalo
+          </span>
         </a>
 
         {/* Facebook float */}
