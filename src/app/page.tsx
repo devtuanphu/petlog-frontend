@@ -446,20 +446,6 @@ export default function LandingPage() {
                   className="px-8 sm:px-10 py-4 rounded-xl bg-linear-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white font-bold text-lg shadow-xl shadow-teal-500/25 transition-all hover:shadow-teal-500/40 hover:-translate-y-0.5">
                   Đăng ký dùng thử ngay →
                 </Link>
-                <span className="text-slate-600 hidden sm:inline">hoặc</span>
-                <a
-                  href="https://zalo.me/0383644795"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-500/15 border border-blue-500/25 text-blue-300 hover:bg-blue-500/25 hover:border-blue-400/40 transition-all font-semibold text-base"
-                >
-                  <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="10" fill="#0068FF"/>
-                    <path d="M24 8C15.163 8 8 14.72 8 23c0 4.695 2.276 8.893 5.85 11.74L12 40l5.63-2.47C19.6 38.47 21.75 39 24 39c8.837 0 16-6.72 16-16S32.837 8 24 8z" fill="white"/>
-                    <path d="M19 21h10M19 25h6" stroke="#0068FF" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                  Chat Zalo — nhận tài khoản ngay
-                </a>
               </div>
 
               <p className="text-xs text-slate-600 mt-5">Chỉ mất 30 giây để bắt đầu · Đội ngũ hỗ trợ sẵn sàng giúp bạn setup</p>
@@ -523,27 +509,14 @@ export default function LandingPage() {
             </h2>
             <p className="text-base sm:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto">
               Nhận ngay <strong className="text-white">14 ngày dùng thử miễn phí</strong> toàn bộ tính năng.
-              Đăng ký chỉ mất 30 giây — hoặc chat Zalo để được hỗ trợ ngay.
+              Đăng ký chỉ mất 30 giây, không cần thẻ tín dụng.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex justify-center">
               <Link href="/register"
                 className="px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl bg-linear-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white font-semibold text-base sm:text-lg shadow-xl shadow-teal-500/20 transition-all hover:shadow-teal-500/30 hover:-translate-y-0.5">
                 Nhận 14 ngày dùng thử miễn phí →
               </Link>
-              <a
-                href="https://zalo.me/0383644795"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 hover:bg-blue-500/20 transition-all font-medium text-base"
-              >
-                <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
-                  <rect width="48" height="48" rx="10" fill="#0068FF"/>
-                  <path d="M24 8C15.163 8 8 14.72 8 23c0 4.695 2.276 8.893 5.85 11.74L12 40l5.63-2.47C19.6 38.47 21.75 39 24 39c8.837 0 16-6.72 16-16S32.837 8 24 8z" fill="white"/>
-                  <path d="M19 21h10M19 25h6" stroke="#0068FF" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-                Chat Zalo nhận tài khoản
-              </a>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-500 mt-5">Không cần thẻ tín dụng · Hủy bất cứ lúc nào</p>
