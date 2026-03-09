@@ -422,7 +422,7 @@ export default function LandingPage() {
           <div className="text-center mb-10 sm:mb-16">
             <p className="text-teal-400 font-semibold text-sm uppercase tracking-widest mb-3">Đơn giản & minh bạch</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Bảng giá</h2>
-            <p className="text-slate-400 mt-3 text-sm sm:text-base">Dùng thử 14 ngày miễn phí, nâng cấp bất cứ lúc nào</p>
+            <p className="text-slate-400 mt-3 text-sm sm:text-base">Có gói miễn phí, nâng cấp bất cứ lúc nào</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
@@ -524,14 +524,14 @@ export default function LandingPage() {
               Sẵn sàng nâng tầm Pet Hotel?
             </h2>
             <p className="text-base sm:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto">
-              Nhận ngay <strong className="text-white">14 ngày dùng thử miễn phí</strong> toàn bộ tính năng.
-              Đăng ký chỉ mất 30 giây, không cần thẻ tín dụng.
+              Bắt đầu <strong className="text-white">hoàn toàn miễn phí</strong> với gói Free.
+              Nâng cấp khi bạn sẵn sàng, không giới hạn thời gian.
             </p>
 
             <div className="flex justify-center">
               <Link href="/register"
                 className="px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl bg-linear-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white font-semibold text-base sm:text-lg shadow-xl shadow-teal-500/20 transition-all hover:shadow-teal-500/30 hover:-translate-y-0.5">
-                Nhận 14 ngày dùng thử miễn phí →
+                Bắt đầu miễn phí ngay →
               </Link>
             </div>
 
