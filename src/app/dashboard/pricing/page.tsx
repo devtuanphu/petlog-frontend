@@ -64,9 +64,11 @@ export default function PricingPage() {
   const [extraLoading, setExtraLoading] = useState(false);
   const [extraPaying, setExtraPaying] = useState(false);
   const [extraRoomPrice, setExtraRoomPrice] = useState(10000);
+
+
   const status = searchParams.get('status');
 
-  const isPaid = subscription?.plan && subscription.plan !== 'trial' && subscription.plan !== 'free';
+  const isPaid = subscription?.plan && subscription.plan !== 'free';
 
   useEffect(() => {
     Promise.all([api.getPlans(), api.getPayments(), api.getExtraRoomPrice()])
@@ -108,6 +110,8 @@ export default function PricingPage() {
     router.push(`/dashboard/pricing/checkout?${params.toString()}`);
   };
 
+
+
   // Extra rooms calculation (for standalone purchase section)
   const calcExtra = useCallback(async (count: number) => {
     if (!isPaid || count < 1) { setExtraCalc(null); return; }
@@ -138,13 +142,7 @@ export default function PricingPage() {
     }
   };
 
-  const isTrialExpired = subscription?.plan === 'trial' &&
-    subscription?.trial_ends_at &&
-    new Date(subscription.trial_ends_at) < new Date();
 
-  const trialDaysLeft = subscription?.trial_ends_at
-    ? Math.max(0, Math.ceil((new Date(subscription.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : 0;
 
   if (loading) return <div className="animate-pulse text-teal-400">Loading...</div>;
 
@@ -171,16 +169,14 @@ export default function PricingPage() {
           <div>
             <p className="text-sm text-slate-400">Gói hiện tại</p>
             <p className="text-lg font-bold text-teal-300">
-              {isPaid ? plans.find(p => p.name === subscription?.plan)?.display_name || subscription?.plan : 'Dùng thử'}
+              {isPaid
+                ? plans.find(p => p.name === subscription?.plan)?.display_name || subscription?.plan
+                : plans.find(p => p.name === subscription?.plan)?.display_name || 'Free'
+              }
             </p>
           </div>
           <div className="text-right">
-            {subscription?.plan === 'trial' && !isTrialExpired && (
-              <p className="text-sm text-yellow-400"><Clock size={14} className="inline mr-1" />Còn {trialDaysLeft} ngày dùng thử</p>
-            )}
-            {isTrialExpired && (
-              <p className="text-sm text-red-400 font-medium">⚠️ Đã hết thời gian dùng thử</p>
-            )}
+
             {isPaid && subscription?.expires_at && (
               <p className="text-sm text-slate-400">Hết hạn: {new Date(subscription.expires_at).toLocaleDateString('vi-VN')}</p>
             )}

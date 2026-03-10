@@ -10,7 +10,7 @@ interface AuthContextType {
   subscription: Subscription | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string }) => Promise<void>;
+  register: (data: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string; plan_name?: string }) => Promise<void>;
   logout: () => void;
   refreshHotel: () => Promise<void>;
 }
@@ -53,12 +53,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { /* ignore */ }
   };
 
-  const register = async (regData: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string }) => {
+  const register = async (regData: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string; plan_name?: string }) => {
     const data = await api.register(regData);
     api.setToken(data.access_token);
     setUser(data.user);
     setHotel(data.hotel);
-    // Fetch subscription data (trial just created)
+    // Fetch subscription data
     try {
       const me = await api.getMe();
       setSubscription(me.subscription);

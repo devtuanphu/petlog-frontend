@@ -153,19 +153,7 @@ export default function SettingsPage() {
             <span className="px-4 py-2 rounded-xl bg-teal-500/20 text-teal-300 font-bold text-lg capitalize">{sub.plan}</span>
             <span className="text-slate-400 text-sm">Tối đa {sub.max_rooms} phòng</span>
           </div>
-          {sub.plan === 'trial' && sub.trial_ends_at && (() => {
-            const d = Math.max(0, Math.ceil((new Date(sub.trial_ends_at).getTime() - Date.now()) / 86400000));
-            const expired = d === 0;
-            return (
-              <div className={`text-sm flex items-center justify-between p-3 rounded-xl ${expired ? 'bg-red-500/10 border border-red-500/30' : 'bg-yellow-500/10 border border-yellow-500/30'}`}>
-                <span className={expired ? 'text-red-400' : 'text-yellow-400'}>
-                  {expired ? 'Hết thời gian dùng thử!' : `Còn ${d} ngày dùng thử`}
-                </span>
-                <a href="/dashboard/pricing" className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-medium transition-colors">Nâng cấp</a>
-              </div>
-            );
-          })()}
-          {sub.plan !== 'trial' && sub.plan !== 'free' && sub.expires_at && (() => {
+          {sub.plan !== 'free' && sub.expires_at && (() => {
             const d = Math.max(0, Math.ceil((new Date(sub.expires_at).getTime() - Date.now()) / 86400000));
             const expired = d === 0;
             return (

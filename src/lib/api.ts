@@ -45,7 +45,7 @@ class ApiClient {
   }
 
   // Auth
-  register(data: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string }) {
+  register(data: { email: string; password: string; full_name: string; hotel_name: string; hotel_address?: string; hotel_phone?: string; plan_name?: string }) {
     return this.request<any>('/auth/register', { method: 'POST', body: JSON.stringify(data) });
   }
 
@@ -199,6 +199,9 @@ class ApiClient {
       price: number; max_rooms: number; description: string;
     }>>('/payment/plans');
   }
+
+
+
 
   createPayment(plan: string, months: number, upgrade = false, extra_rooms = 0) {
     return this.request<{ checkoutUrl: string; orderCode: number; amount: number }>(

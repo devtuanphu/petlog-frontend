@@ -177,7 +177,7 @@ export default function RevenuePage() {
   const s = data || { today:{total:0,room:0,services:0,count:0}, week:{total:0,room:0,services:0,count:0}, month:{total:0,room:0,services:0,count:0}, all_time:{total:0,room:0,services:0,count:0}, by_room_type:[], top_services:[], monthly:[], recent_bookings:[] };
 
   return (
-    <div className="max-w-[1100px] relative">
+    <div className="w-full relative">
       {/* Background glow effects */}
       <div className="absolute -top-20 -right-20 w-60 h-60 bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-40 -left-20 w-40 h-40 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
