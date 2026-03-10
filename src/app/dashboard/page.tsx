@@ -101,21 +101,20 @@ export default function DashboardPage() {
     <div>
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-8">Tổng quan</h1>
 
-      {/* Banner: need to choose a plan */}
-      {needsPlan && (
-        <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={18} className="text-amber-400 shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-amber-300">Bạn chưa chọn gói dịch vụ</p>
-              <p className="text-xs text-amber-400/60">Chọn gói để tạo phòng và sử dụng đầy đủ tính năng</p>
-            </div>
+      {/* Block everything when no plan selected */}
+      {needsPlan ? (
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/15 flex items-center justify-center mb-4">
+            <AlertTriangle size={32} className="text-amber-400" />
           </div>
-          <Link href="/dashboard/pricing" className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors shrink-0">
-            Chọn gói ngay
+          <h2 className="text-lg md:text-xl font-bold text-white mb-2">Bạn chưa chọn gói dịch vụ</h2>
+          <p className="text-sm text-slate-400 mb-6 max-w-md">Vui lòng chọn gói phù hợp để bắt đầu sử dụng phòng và tất cả tính năng của PetLog</p>
+          <Link href="/dashboard/pricing" className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-medium transition-colors">
+            Chọn gói ngay →
           </Link>
         </div>
-      )}
+      ) : (
+      <>
 
       {/* Overdue alert banner */}
       {overdueRooms.length > 0 && (
@@ -280,6 +279,8 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

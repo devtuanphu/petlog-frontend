@@ -134,6 +134,9 @@ export default function RoomsPage() {
         </div>
       )}
 
+      {!needsPlan && (
+      <>
+
       {/* Filter by room type */}
       {roomTypes.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
@@ -333,6 +336,8 @@ export default function RoomsPage() {
             </button>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );
