@@ -7,6 +7,7 @@ import { DoorOpen, AlertTriangle, Clock, CalendarPlus, X, Siren, QrCode, Share2,
 import { QRCodeSVG } from 'qrcode.react';
 import { copyToClipboard } from '@/lib/clipboard';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Room } from '@/types';
 
 function isOverdue(room: Room): boolean {
@@ -30,6 +31,8 @@ function overdueText(date: string): string {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { subscription } = useAuth();
+  const needsPlan = subscription ? ['none', 'free', 'trial'].includes(subscription.plan) : false;
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,6 +100,22 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-8">Tổng quan</h1>
+
+      {/* Banner: need to choose a plan */}
+      {needsPlan && (
+        <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={18} className="text-amber-400 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-amber-300">Bạn chưa chọn gói dịch vụ</p>
+              <p className="text-xs text-amber-400/60">Chọn gói để tạo phòng và sử dụng đầy đủ tính năng</p>
+            </div>
+          </div>
+          <Link href="/dashboard/pricing" className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors shrink-0">
+            Chọn gói ngay
+          </Link>
+        </div>
+      )}
 
       {/* Overdue alert banner */}
       {overdueRooms.length > 0 && (
