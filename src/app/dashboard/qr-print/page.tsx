@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Printer } from 'lucide-react';
+import { Printer, AlertTriangle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Room } from '@/types';
+import Link from 'next/link';
 
 function getCheckinUrl(qrToken: string) {
   if (typeof window !== 'undefined') {
@@ -72,6 +74,8 @@ export default function QrPrintPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const qrContainerRef = useRef<HTMLDivElement>(null);
+  const { subscription } = useAuth();
+  const needsPlan = subscription ? ['none', 'free', 'trial'].includes(subscription.plan) : false;
 
   useEffect(() => { api.getRooms().then(setRooms).finally(() => setLoading(false)); }, []);
 
@@ -120,6 +124,16 @@ export default function QrPrintPage() {
         </button>
       </div>
 
+      {needsPlan ? (
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
+          <AlertTriangle size={32} className="text-amber-400 mb-3" />
+          <p className="text-sm text-slate-400 mb-4">Chọn gói để sử dụng tính năng in QR</p>
+          <Link href="/dashboard/pricing" className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-medium text-sm transition-colors">
+            Chọn gói ngay
+          </Link>
+        </div>
+      ) : (
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" ref={qrContainerRef}>
         {rooms.map((room: Room) => (
           <div key={room.id} data-room-id={room.id} className="rounded-xl bg-white p-5 md:p-6 text-center text-gray-900 group relative">
@@ -146,6 +160,7 @@ export default function QrPrintPage() {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }
