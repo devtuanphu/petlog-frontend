@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LayoutDashboard, DoorOpen, ClipboardList, Users, QrCode, Settings, LogOut, MessageSquare, Crown, BookOpen, Menu, X, ScanLine, FileText, Sparkles, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import PlanSelectionModal from '@/components/PlanSelectionModal';
+
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: ('owner' | 'staff')[] };
 
@@ -40,14 +40,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const [expiryInfo, setExpiryInfo] = useState<{ daysLeft: number; isExpired: boolean; message: string } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showPlanModal, setShowPlanModal] = useState(false);
+
 
   const userRole = user?.role || 'staff';
   const filteredNav = navItems.filter(item => item.roles.includes(userRole));
   const filteredMobileTabs = mobileTabItems.filter(item => item.roles.includes(userRole)).slice(0, 5);
 
-  // Derived: does this account need to select a plan?
-  const needsPlan = subscription ? ['none', 'free', 'trial'].includes(subscription.plan) && userRole === 'owner' : false;
+
 
   useEffect(() => {
     if (!subscription) { setExpiryInfo(null); return; }
@@ -75,12 +74,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  // Auto-show plan modal when account needs a plan
-  useEffect(() => {
-    if (needsPlan) {
-      setShowPlanModal(true);
-    }
-  }, [needsPlan]);
+
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse text-teal-400">Loading...</div></div>;
   if (!user) return null;
@@ -189,22 +183,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
         {children}
 
-        {/* Blocking overlay — when user dismissed modal but hasn't selected a plan */}
-        {needsPlan && !showPlanModal && (
-          <div
-            onClick={() => setShowPlanModal(true)}
-            className="fixed inset-0 z-30 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center cursor-pointer md:ml-64"
-          >
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 sm:p-6 mx-4 max-w-sm text-center shadow-xl">
-              <Crown size={28} className="text-teal-400 mx-auto mb-3" />
-              <h3 className="text-base sm:text-lg font-bold text-white mb-1.5">Cần chọn gói để tiếp tục</h3>
-              <p className="text-xs sm:text-sm text-slate-400 mb-4">Vui lòng chọn gói phù hợp để sử dụng đầy đủ tính năng PetLog</p>
-              <button className="w-full py-2.5 sm:py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors">
-                Chọn gói ngay
-              </button>
-            </div>
-          </div>
-        )}
+
       </main>
 
       {/* Mobile Bottom Tab Bar — FIXED, full width, no overflow */}
@@ -244,10 +223,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </a>
 
-      {/* Plan selection modal */}
-      {showPlanModal && (
-        <PlanSelectionModal onDismiss={() => setShowPlanModal(false)} />
-      )}
+
     </div>
   );
 }

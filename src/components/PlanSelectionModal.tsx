@@ -76,7 +76,8 @@ export default function PlanSelectionModal({ onDismiss }: PlanSelectionModalProp
         if (!res.ok) throw new Error(data.message || 'Không thể chọn gói');
         window.location.reload();
       } else {
-        // Paid plan — go to checkout
+        // Paid plan — close modal then go to checkout
+        onDismiss();
         const params = new URLSearchParams({
           plan: plan.name,
           months: '1',

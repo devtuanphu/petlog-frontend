@@ -6,7 +6,9 @@ import { QrCode, X, Copy, Check, Share2, Trash2, Plus, BookOpen, Tag, AlertTrian
 import { QRCodeSVG } from 'qrcode.react';
 import { copyToClipboard } from '@/lib/clipboard';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Room } from '@/types';
+import Link from 'next/link';
 
 interface RoomType {
   id: number; name: string; daily_rate: number; color: string; icon: string; is_active: boolean;
@@ -17,6 +19,8 @@ const formatVND = (n: number) => n ? new Intl.NumberFormat('vi-VN').format(n) + 
 
 export default function RoomsPage() {
   const router = useRouter();
+  const { subscription } = useAuth();
+  const needsPlan = subscription ? ['none', 'free', 'trial'].includes(subscription.plan) : false;
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +62,11 @@ export default function RoomsPage() {
 
   const addRoom = async () => {
     if (!newName.trim()) return;
+    if (needsPlan) {
+      alert('Vui lòng chọn gói trước khi tạo phòng. Đi đến trang Nâng cấp để chọn gói.');
+      router.push('/dashboard/pricing');
+      return;
+    }
     setAdding(true);
     try {
       await api.createRoom(newName.trim());
@@ -111,6 +120,19 @@ export default function RoomsPage() {
         <h1 className="text-xl md:text-2xl font-bold">Quản lý phòng</h1>
         <span className="text-sm text-slate-400">{rooms.length} phòng</span>
       </div>
+
+      {/* Banner: need to choose a plan */}
+      {needsPlan && (
+        <div className="mb-4 p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+            <p className="text-xs sm:text-sm text-amber-300">Bạn cần chọn gói để tạo và quản lý phòng</p>
+          </div>
+          <Link href="/dashboard/pricing" className="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors shrink-0">
+            Chọn gói ngay
+          </Link>
+        </div>
+      )}
 
       {/* Filter by room type */}
       {roomTypes.length > 0 && (
