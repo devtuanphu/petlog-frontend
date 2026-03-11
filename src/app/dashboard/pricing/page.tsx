@@ -100,8 +100,26 @@ export default function PricingPage() {
     }
   }, [isPaid, subscription?.plan]);
 
-  // Navigate to checkout page
-  const goToCheckout = (plan: Plan) => {
+  const [activating, setActivating] = useState<string | null>(null);
+
+  // Navigate to checkout page (paid plans) or activate directly (free plans)
+  const goToCheckout = async (plan: Plan) => {
+    // Free plan — activate immediately, no checkout needed
+    if (plan.price === 0) {
+      setActivating(plan.name);
+      try {
+        await api.selectPlan(plan.name);
+        // Reload page to refresh subscription state
+        window.location.href = '/dashboard/pricing?status=success';
+      } catch (err: unknown) {
+        const e = err as Error;
+        alert(e.message || 'Lỗi kích hoạt gói');
+        setActivating(null);
+      }
+      return;
+    }
+
+    // Paid plan — go to checkout
     const params = new URLSearchParams({
       plan: plan.name,
       months: months.toString(),
@@ -302,7 +320,7 @@ export default function PricingPage() {
 
               <button
                 onClick={() => goToCheckout(plan)}
-                disabled={isCurrent || isLower}
+                disabled={isCurrent || isLower || activating === plan.name}
                 className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
                   isCurrent
                     ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
@@ -312,7 +330,9 @@ export default function PricingPage() {
                         ? 'bg-teal-600 hover:bg-teal-500 text-white'
                         : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}>
-                {isCurrent ? (
+                {activating === plan.name ? (
+                  <span className="animate-pulse">Đang kích hoạt...</span>
+                ) : isCurrent ? (
                   'Gói hiện tại'
                 ) : isLower ? (
                   'Không thể hạ gói'

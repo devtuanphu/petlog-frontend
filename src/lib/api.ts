@@ -210,6 +210,13 @@ class ApiClient {
     );
   }
 
+  selectPlan(plan: string) {
+    return this.request<{ success: boolean; plan: string; message: string } | { checkoutUrl: string }>(
+      '/payment/select-plan',
+      { method: 'POST', body: JSON.stringify({ plan }) },
+    );
+  }
+
   calculateUpgrade(plan: string) {
     return this.request<{
       type: 'new' | 'upgrade';
